@@ -1,11 +1,41 @@
 import { useParams, Link } from "react-router-dom";
-import { articles } from "@/data/articles";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import type { Tables } from "@/integrations/supabase/types";
+
+type DbArticle = Tables<"articles">;
 
 const ArticlePage = () => {
   const { id } = useParams();
-  const article = articles.find((a) => a.id === id);
+  const [article, setArticle] = useState<DbArticle | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { data } = await supabase
+        .from("articles")
+        .select("*")
+        .eq("id", id!)
+        .maybeSingle();
+      setArticle(data);
+      setLoading(false);
+    };
+    fetch();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-muted-foreground text-sm">Loading...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!article) {
     return (
@@ -35,18 +65,20 @@ const ArticlePage = () => {
             {article.title}
           </h1>
           <div className="mt-4 flex items-center gap-3 text-sm text-muted-foreground">
-            <span>{article.author}</span>
+            <span>{article.author_name}</span>
             <span>·</span>
-            <span>{article.readTime} read</span>
+            <span>{article.read_time} read</span>
             <span>·</span>
-            <time>{new Date(article.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</time>
+            <time>{new Date(article.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</time>
           </div>
+          {article.image_url && (
+            <img src={article.image_url} alt={article.title} className="mt-6 w-full max-h-96 object-cover" />
+          )}
           <div className="mt-8 h-px bg-muted" />
-          <div className="mt-8 space-y-5 text-base leading-relaxed text-foreground/90">
-            {article.content.split("\n\n").map((paragraph, i) => (
-              <p key={i}>{paragraph}</p>
-            ))}
-          </div>
+          <div
+            className="mt-8 prose prose-invert max-w-none text-foreground/90 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: article.content }}
+          />
         </div>
       </article>
       <Footer />

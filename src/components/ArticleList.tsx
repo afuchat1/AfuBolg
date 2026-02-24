@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import type { Article } from "@/data/articles";
+import type { ArticleData } from "./FeaturedArticle";
 
-const ArticleList = ({ articles }: { articles: Article[] }) => {
+const ArticleList = ({ articles }: { articles: ArticleData[] }) => {
   return (
     <section className="py-6">
       <div className="container">

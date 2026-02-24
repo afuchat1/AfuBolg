@@ -1,7 +1,19 @@
 import { Link } from "react-router-dom";
-import type { Article } from "@/data/articles";
 
-const FeaturedArticle = ({ article }: { article: Article }) => {
+export interface ArticleData {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  author: string;
+  date: string;
+  readTime: string;
+  featured?: boolean;
+  imageUrl?: string | null;
+}
+
+const FeaturedArticle = ({ article }: { article: ArticleData }) => {
   return (
     <article className="py-10">
       <div className="container">
@@ -13,6 +25,9 @@ const FeaturedArticle = ({ article }: { article: Article }) => {
             {article.title}
           </Link>
         </h1>
+        {article.imageUrl && (
+          <img src={article.imageUrl} alt={article.title} className="mt-4 w-full max-h-96 object-cover" />
+        )}
         <p className="mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground">
           {article.excerpt}
         </p>
