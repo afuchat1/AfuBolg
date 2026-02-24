@@ -8,6 +8,12 @@ import ArticlePage from "./pages/ArticlePage";
 import CategoryPage from "./pages/CategoryPage";
 import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
+import SearchPage from "./pages/SearchPage";
+import ArchivePage from "./pages/ArchivePage";
+import PrivacyPage from "./pages/PrivacyPage";
+import TermsPage from "./pages/TermsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +30,12 @@ const App = () => (
           <Route path="/category/:category" element={<CategoryPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/archive" element={<ArchivePage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
