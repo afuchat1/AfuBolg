@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ArticleList from "@/components/ArticleList";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import type { Tables } from "@/integrations/supabase/types";
 
 type DbArticle = Tables<"articles">;
@@ -43,6 +44,7 @@ const CategoryPage = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <div className="container flex-1 py-10">
+        <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: category || "Category" }]} />
         <h1 className="font-heading text-3xl font-bold capitalize">{category}</h1>
         {loading ? (
           <p className="mt-6 text-muted-foreground text-sm">Loading...</p>

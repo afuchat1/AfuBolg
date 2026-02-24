@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import type { Tables } from "@/integrations/supabase/types";
 
 type DbArticle = Tables<"articles">;
@@ -42,8 +43,8 @@ const ArticlePage = () => {
       <div className="min-h-screen flex flex-col">
         <Header />
         <div className="container flex-1 py-20">
+          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Articles" }]} />
           <p className="text-muted-foreground">Article not found.</p>
-          <Link to="/" className="mt-4 inline-block text-primary">← Back to home</Link>
         </div>
         <Footer />
       </div>
@@ -55,9 +56,11 @@ const ArticlePage = () => {
       <Header />
       <article className="flex-1 py-10">
         <div className="container max-w-3xl">
-          <Link to="/" className="text-xs text-muted-foreground hover:text-primary transition-colors no-underline">
-            ← Back
-          </Link>
+          <Breadcrumbs items={[
+            { label: "Home", href: "/" },
+            { label: article.category, href: `/category/${article.category.toLowerCase()}` },
+            { label: article.title },
+          ]} />
           <span className="mt-6 block text-xs font-medium uppercase tracking-widest text-primary">
             {article.category}
           </span>
