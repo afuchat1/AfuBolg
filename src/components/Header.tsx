@@ -20,6 +20,9 @@ const Header = () => {
                 {cat}
               </Link>
             ))}
+            <Link to="/admin" className="text-sm text-muted-foreground hover:text-primary transition-colors no-underline">
+              Dashboard
+            </Link>
           </nav>
         </div>
         <div className="mt-4 h-px bg-muted" />
