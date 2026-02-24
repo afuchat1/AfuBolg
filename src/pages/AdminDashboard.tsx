@@ -5,7 +5,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import RichTextEditor from "@/components/RichTextEditor";
 import AITools from "@/components/AITools";
-import { Plus, Edit, Trash2, Eye, EyeOff, Star, LogOut, ArrowLeft } from "lucide-react";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { Plus, Edit, Trash2, Eye, EyeOff, Star, LogOut } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Article = Tables<"articles">;
@@ -144,9 +145,11 @@ const AdminDashboard = () => {
       <div className="min-h-screen">
         <div className="container max-w-4xl py-6">
           <div className="flex items-center justify-between mb-6">
-            <button onClick={() => setEditingArticle(null)} className="text-sm text-muted-foreground hover:text-primary flex items-center gap-1">
-              <ArrowLeft size={14} /> Back to list
-            </button>
+            <Breadcrumbs items={[
+              { label: "Home", href: "/" },
+              { label: "Dashboard", onClick: () => setEditingArticle(null) },
+              { label: isNew ? "New Article" : (editingArticle.title || "Edit Article") },
+            ]} />
             <div className="flex gap-2">
               <button onClick={save} className="bg-primary text-primary-foreground px-4 py-1.5 text-sm font-medium hover:opacity-90 transition-opacity">
                 {isNew ? "Create" : "Update"}
@@ -262,8 +265,8 @@ const AdminDashboard = () => {
       <div className="container py-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <Link to="/" className="text-xs text-muted-foreground hover:text-primary no-underline">← Back to site</Link>
-            <h1 className="font-heading text-2xl font-bold mt-1">Content Dashboard</h1>
+            <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Dashboard" }]} />
+            <h1 className="font-heading text-2xl font-bold">Content Dashboard</h1>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={startNew} className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-1.5 text-sm font-medium hover:opacity-90 transition-opacity">
