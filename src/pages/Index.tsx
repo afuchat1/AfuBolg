@@ -4,7 +4,6 @@ import Header from "@/components/Header";
 import FeaturedArticle from "@/components/FeaturedArticle";
 import ArticleList from "@/components/ArticleList";
 import Footer from "@/components/Footer";
-import { SkeletonFeatured, SkeletonArticleList } from "@/components/SkeletonArticle";
 import type { Tables } from "@/integrations/supabase/types";
 
 type DbArticle = Tables<"articles">;
@@ -42,30 +41,35 @@ const Index = () => {
     imageUrl: a.image_url,
   });
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-xs text-muted-foreground">Loading updates...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      {loading ? (
+      {featured && <FeaturedArticle article={mapArticle(featured)} />}
+      {rest.length > 0 && (
         <>
-          <SkeletonFeatured />
           <div className="h-px bg-muted container" />
-          <SkeletonArticleList count={5} />
+          <ArticleList articles={rest.map(mapArticle)} />
         </>
-      ) : (
-        <>
-          {featured && <FeaturedArticle article={mapArticle(featured)} />}
-          {rest.length > 0 && (
-            <>
-              <div className="h-px bg-muted container" />
-              <ArticleList articles={rest.map(mapArticle)} />
-            </>
-          )}
-          {articles.length === 0 && (
-            <div className="flex-1 flex items-center justify-center">
-              <p className="text-muted-foreground">No articles published yet.</p>
-            </div>
-          )}
-        </>
+      )}
+      {articles.length === 0 && (
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-muted-foreground">No updates published yet.</p>
+        </div>
       )}
       <Footer />
     </div>

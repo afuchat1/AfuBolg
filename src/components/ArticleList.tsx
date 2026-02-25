@@ -6,7 +6,7 @@ const ArticleList = ({ articles }: { articles: ArticleData[] }) => {
     <section className="py-6">
       <div className="container">
         <h2 className="font-heading text-xs font-medium uppercase tracking-widest text-muted-foreground mb-6">
-          Latest
+          Latest Updates
         </h2>
         <div className="space-y-0">
           {articles.map((article, i) => (
@@ -14,9 +14,6 @@ const ArticleList = ({ articles }: { articles: ArticleData[] }) => {
               {i > 0 && <div className="h-px bg-muted my-6" />}
               <div className="grid md:grid-cols-[1fr_200px] gap-4">
                 <div>
-                  <span className="text-xs font-medium uppercase tracking-widest text-primary">
-                    {article.category}
-                  </span>
                   <h3 className="mt-1 font-heading text-xl font-semibold leading-snug">
                     <Link
                       to={`/article/${article.id}`}

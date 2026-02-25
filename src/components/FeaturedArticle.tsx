@@ -17,9 +17,6 @@ const FeaturedArticle = ({ article }: { article: ArticleData }) => {
   return (
     <article className="py-10">
       <div className="container">
-        <span className="text-xs font-medium uppercase tracking-widest text-primary">
-          {article.category}
-        </span>
         <h1 className="mt-3 font-heading text-4xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl">
           <Link to={`/article/${article.id}`} className="text-foreground no-underline hover:text-primary transition-colors">
             {article.title}
