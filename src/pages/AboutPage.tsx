@@ -16,41 +16,31 @@ const AboutPage = () => {
 
           <div className="mt-8 space-y-6 text-foreground/90 leading-relaxed">
             <p>
-              AfuBlog is an independent digital publication dedicated to delivering insightful, 
-              well-researched journalism on the topics that shape our world — from technology and 
-              science to markets, energy, and policy.
+              AfuBlog is the official news and updates platform for{" "}
+              <a href="https://afuchat.com" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">AfuChat.com</a>{" "}
+              — your AI-powered conversational assistant. We share product updates, industry insights, 
+              and the latest developments in AI technology.
             </p>
 
             <h2 className="font-heading text-2xl font-semibold mt-10">Our Mission</h2>
             <p>
-              We believe in the power of clear, honest reporting. In an era of information overload, 
-              AfuBlog cuts through the noise to bring you stories that matter, written with depth 
-              and nuance. Our commitment is to accuracy, context, and analysis that helps you 
-              understand not just what happened, but why it matters.
+              We keep our community informed about the latest features, improvements, and breakthroughs 
+              happening at AfuChat. From new AI capabilities to platform updates, AfuBlog is your 
+              go-to source for everything AfuChat.
             </p>
 
-            <h2 className="font-heading text-2xl font-semibold mt-10">What We Cover</h2>
-            <ul className="space-y-3 text-muted-foreground">
-              <li><span className="text-primary font-medium">Technology</span> — AI, quantum computing, electric aviation, and the innovations shaping tomorrow</li>
-              <li><span className="text-primary font-medium">Markets</span> — Global financial analysis, central bank policy, and investment trends</li>
-              <li><span className="text-primary font-medium">Science</span> — Breakthrough research in medicine, physics, and environmental science</li>
-              <li><span className="text-primary font-medium">Energy</span> — The transition to renewable energy and sustainable infrastructure</li>
-              <li><span className="text-primary font-medium">Policy</span> — Climate agreements, regulation, and the policy decisions that affect us all</li>
-              <li><span className="text-primary font-medium">Economy</span> — Remote work, housing, labor markets, and economic transformation</li>
-            </ul>
-
-            <h2 className="font-heading text-2xl font-semibold mt-10">Our Team</h2>
+            <h2 className="font-heading text-2xl font-semibold mt-10">Powered by AfuChat</h2>
             <p>
-              AfuBlog is powered by a team of experienced journalists, analysts, and subject-matter 
-              experts. We combine traditional editorial rigor with AI-assisted research tools to 
-              deliver content that is both timely and thoroughly vetted.
+              <strong>AfuChat.com</strong> is an AI-powered platform that helps users with conversations, 
+              content creation, code assistance, and more. Our blog is managed by the AfuChat editorial 
+              team and uses AI to categorize and organize content automatically.
             </p>
 
             <h2 className="font-heading text-2xl font-semibold mt-10">Contact Us</h2>
             <p>
-              Have a story tip, feedback, or just want to say hello? Visit our{" "}
+              Have feedback or a story tip? Visit our{" "}
               <a href="/contact">contact page</a> or reach out at{" "}
-              <span className="text-primary">hello@afublog.com</span>.
+              <span className="text-primary">hello@afuchat.com</span>.
             </p>
           </div>
         </div>

@@ -4,7 +4,6 @@ import { Search, Menu, X } from "lucide-react";
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const categories = ["Markets", "Technology", "Economy", "Energy", "Policy", "Science"];
   const pages = [
     { label: "About", href: "/about" },
     { label: "Archive", href: "/archive" },
@@ -17,20 +16,11 @@ const Header = () => {
         <div className="flex items-center justify-between">
           <Link to="/" className="font-heading text-2xl font-bold tracking-tight text-foreground no-underline hover:opacity-100">
             Afu<span className="text-primary">Blog</span>
+            <span className="text-xs text-muted-foreground ml-2 font-normal">by AfuChat.com</span>
           </Link>
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-5">
-            {categories.map((cat) => (
-              <Link
-                key={cat}
-                to={`/category/${cat.toLowerCase()}`}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors no-underline"
-              >
-                {cat}
-              </Link>
-            ))}
-            <div className="w-px h-4 bg-muted" />
             {pages.map((p) => (
               <Link
                 key={p.label}
@@ -61,17 +51,6 @@ const Header = () => {
         {/* Mobile nav */}
         {mobileOpen && (
           <nav className="lg:hidden mt-4 flex flex-col gap-3">
-            {categories.map((cat) => (
-              <Link
-                key={cat}
-                to={`/category/${cat.toLowerCase()}`}
-                onClick={() => setMobileOpen(false)}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors no-underline py-1"
-              >
-                {cat}
-              </Link>
-            ))}
-            <div className="h-px bg-muted my-1" />
             {pages.map((p) => (
               <Link
                 key={p.label}
