@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import RichTextEditor from "@/components/RichTextEditor";
 import AITools from "@/components/AITools";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import { Plus, Edit, Trash2, Eye, EyeOff, Star, LogOut } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, EyeOff, Star, LogOut, Shield } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Article = Tables<"articles">;
@@ -272,6 +272,9 @@ const AdminDashboard = () => {
             <button onClick={startNew} className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-1.5 text-sm font-medium hover:opacity-90 transition-opacity">
               <Plus size={14} /> New Article
             </button>
+            <Link to="/admin/admins" className="text-muted-foreground hover:text-primary transition-colors" title="Manage Admins">
+              <Shield size={18} />
+            </Link>
             <button onClick={() => { signOut(); navigate("/"); }} className="text-muted-foreground hover:text-foreground transition-colors">
               <LogOut size={18} />
             </button>
