@@ -1,12 +1,38 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Tables } from "@/integrations/supabase/types";
 
 type DbArticle = Tables<"articles">;
+
+const ArticlePageSkeleton = () => (
+  <div className="min-h-screen flex flex-col">
+    <Header />
+    <div className="flex-1 py-10">
+      <div className="container max-w-3xl">
+        <Skeleton className="h-4 w-48 mb-6" />
+        <Skeleton className="h-3 w-20 mb-3" />
+        <Skeleton className="h-10 w-3/4 mb-2" />
+        <Skeleton className="h-10 w-1/2 mb-4" />
+        <div className="flex gap-3 mb-6">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-4 w-28" />
+        </div>
+        <Skeleton className="h-64 w-full mb-6" />
+        <Skeleton className="h-px w-full mb-6" />
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton key={i} className="h-4 w-full mb-3" />
+        ))}
+      </div>
+    </div>
+    <Footer />
+  </div>
+);
 
 const ArticlePage = () => {
   const { id } = useParams();
@@ -26,17 +52,7 @@ const ArticlePage = () => {
     fetch();
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-muted-foreground text-sm">Loading...</p>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
+  if (loading) return <ArticlePageSkeleton />;
 
   if (!article) {
     return (
