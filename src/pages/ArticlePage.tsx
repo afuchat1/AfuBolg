@@ -55,7 +55,7 @@ const ArticlePage = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <article className="flex-1 py-10">
-        <div className="container max-w-3xl">
+        <div className="container">
           <Breadcrumbs items={[
             { label: "Home", href: "/" },
             { label: article.title },
