@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import PageFooter from "@/components/PageFooter";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -28,12 +28,8 @@ const ArticlePage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-        </div>
-        <Footer />
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -46,7 +42,7 @@ const ArticlePage = () => {
           <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Not Found" }]} />
           <p className="text-muted-foreground">Article not found.</p>
         </div>
-        <Footer />
+        <PageFooter pageName="Article" relatedLinks={[{ label: "Home", href: "/" }]} />
       </div>
     );
   }
@@ -80,7 +76,14 @@ const ArticlePage = () => {
           />
         </div>
       </article>
-      <Footer />
+      <PageFooter
+        pageName="Article"
+        relatedLinks={[
+          { label: "Home", href: "/" },
+          { label: "Archive", href: "/archive" },
+          { label: "Search", href: "/search" },
+        ]}
+      />
     </div>
   );
 };
