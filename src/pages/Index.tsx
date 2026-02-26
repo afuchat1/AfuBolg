@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import FeaturedArticle from "@/components/FeaturedArticle";
 import ArticleList from "@/components/ArticleList";
-import Footer from "@/components/Footer";
+import PageFooter from "@/components/PageFooter";
 import type { Tables } from "@/integrations/supabase/types";
 
 type DbArticle = Tables<"articles">;
@@ -46,12 +46,8 @@ const Index = () => {
       <div className="min-h-screen flex flex-col">
         <Header />
         <div className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
-            <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            <p className="text-xs text-muted-foreground">Loading updates...</p>
-          </div>
+          <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
-        <Footer />
       </div>
     );
   }
@@ -71,7 +67,16 @@ const Index = () => {
           <p className="text-muted-foreground">No updates published yet.</p>
         </div>
       )}
-      <Footer />
+      <PageFooter
+        pageName="Home"
+        relatedLinks={[
+          { label: "About", href: "/about" },
+          { label: "Archive", href: "/archive" },
+          { label: "Contact", href: "/contact" },
+          { label: "Privacy", href: "/privacy" },
+          { label: "Terms", href: "/terms" },
+        ]}
+      />
     </div>
   );
 };
