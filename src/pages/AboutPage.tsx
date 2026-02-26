@@ -7,7 +7,7 @@ const AboutPage = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 py-10">
-        <div className="container max-w-3xl">
+        <div className="container">
           <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "About" }]} />
 
           <h1 className="font-heading text-4xl font-bold tracking-tight md:text-5xl">

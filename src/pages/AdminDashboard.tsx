@@ -33,7 +33,6 @@ const AdminDashboard = () => {
     const { data, error } = await supabase
       .from("articles")
       .select("*")
-      .eq("author_id", user!.id)
       .order("created_at", { ascending: false });
 
     if (error) toast.error(error.message);

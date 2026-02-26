@@ -42,7 +42,7 @@ const AuthPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-md">
         <h1 className="font-heading text-2xl font-bold mb-1">
           {isLogin ? "Sign in" : "Create account"}
         </h1>
