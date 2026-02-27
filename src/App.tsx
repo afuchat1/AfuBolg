@@ -8,6 +8,9 @@ import Index from "./pages/Index";
 import ArticlePage from "./pages/ArticlePage";
 import CategoryPage from "./pages/CategoryPage";
 import AuthPage from "./pages/AuthPage";
+import WritePage from "./pages/WritePage";
+import EditArticlePage from "./pages/EditArticlePage";
+import DashboardPage from "./pages/DashboardPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminManageAdmins from "./pages/AdminManageAdmins";
 import AboutPage from "./pages/AboutPage";
@@ -32,6 +35,9 @@ const App = () => (
           <Route path="/article/:id" element={<ArticlePage />} />
           <Route path="/category/:category" element={<CategoryPage />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/write" element={<WritePage />} />
+          <Route path="/edit/:id" element={<EditArticlePage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/admins" element={<AdminManageAdmins />} />
           <Route path="/about" element={<AboutPage />} />
