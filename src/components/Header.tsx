@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { Search, Menu, X } from "lucide-react";
+import { Search, Menu, X, PenSquare, LayoutDashboard } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user } = useAuth();
+
   const pages = [
     { label: "About", href: "/about" },
     { label: "Archive", href: "/archive" },
@@ -33,9 +36,27 @@ const Header = () => {
             <Link to="/search" className="text-muted-foreground hover:text-primary transition-colors" aria-label="Search">
               <Search size={16} />
             </Link>
-            <Link to="/admin" className="text-sm text-muted-foreground hover:text-primary transition-colors no-underline">
-              Dashboard
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  to="/write"
+                  className="flex items-center gap-1.5 bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium hover:opacity-90 transition-opacity no-underline"
+                >
+                  <PenSquare size={14} />
+                  Write
+                </Link>
+                <Link to="/dashboard" className="text-muted-foreground hover:text-primary transition-colors" title="Dashboard">
+                  <LayoutDashboard size={16} />
+                </Link>
+              </>
+            ) : (
+              <Link
+                to="/auth"
+                className="flex items-center gap-1.5 bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium hover:opacity-90 transition-opacity no-underline"
+              >
+                Start Writing
+              </Link>
+            )}
           </nav>
 
           {/* Mobile toggle */}
@@ -61,20 +82,24 @@ const Header = () => {
                 {p.label}
               </Link>
             ))}
-            <Link
-              to="/search"
-              onClick={() => setMobileOpen(false)}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors no-underline py-1"
-            >
+            <Link to="/search" onClick={() => setMobileOpen(false)} className="text-sm text-muted-foreground hover:text-primary transition-colors no-underline py-1">
               Search
             </Link>
-            <Link
-              to="/admin"
-              onClick={() => setMobileOpen(false)}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors no-underline py-1"
-            >
-              Dashboard
-            </Link>
+            {user ? (
+              <>
+                <Link to="/write" onClick={() => setMobileOpen(false)} className="flex items-center gap-1.5 bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium hover:opacity-90 transition-opacity no-underline w-fit">
+                  <PenSquare size={14} />
+                  Write
+                </Link>
+                <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="text-sm text-muted-foreground hover:text-primary transition-colors no-underline py-1">
+                  Dashboard
+                </Link>
+              </>
+            ) : (
+              <Link to="/auth" onClick={() => setMobileOpen(false)} className="flex items-center gap-1.5 bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium hover:opacity-90 transition-opacity no-underline w-fit">
+                Start Writing
+              </Link>
+            )}
           </nav>
         )}
 
