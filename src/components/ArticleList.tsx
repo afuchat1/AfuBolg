@@ -1,50 +1,26 @@
-import { Link } from "react-router-dom";
+import ArticleCard from "./ArticleCard";
 import type { ArticleData } from "./FeaturedArticle";
 
 const ArticleList = ({ articles }: { articles: ArticleData[] }) => {
   return (
-    <section className="py-6">
-      <div className="container">
-        <h2 className="font-heading text-xs font-medium uppercase tracking-widest text-muted-foreground mb-6">
-          Latest Updates
-        </h2>
-        <div className="space-y-0">
-          {articles.map((article, i) => (
-            <article key={article.id}>
-              {i > 0 && <div className="h-px bg-muted my-6" />}
-              <div className="grid md:grid-cols-[1fr_200px] gap-4">
-                <div>
-                  <h3 className="mt-1 font-heading text-xl font-semibold leading-snug">
-                    <Link
-                      to={`/article/${article.id}`}
-                      className="text-foreground no-underline hover:text-primary transition-colors"
-                    >
-                      {article.title}
-                    </Link>
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-2">
-                    {article.excerpt}
-                  </p>
-                  <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-                    <span>{article.author}</span>
-                    <span>·</span>
-                    <span>{article.readTime}</span>
-                  </div>
-                </div>
-                {article.imageUrl && (
-                  <Link to={`/article/${article.id}`} className="block">
-                    <img
-                      src={article.imageUrl}
-                      alt={article.title}
-                      className="w-full h-32 object-cover"
-                      loading="lazy"
-                    />
-                  </Link>
-                )}
-              </div>
-            </article>
-          ))}
-        </div>
+    <section className="py-12 px-6 sm:px-12 lg:px-20">
+      <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-8">
+        All Stories
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {articles.map((article) => (
+          <ArticleCard
+            key={article.id}
+            id={article.id}
+            title={article.title}
+            excerpt={article.excerpt}
+            category={article.category}
+            author={article.author}
+            date={article.date}
+            readTime={article.readTime}
+            imageUrl={article.imageUrl}
+          />
+        ))}
       </div>
     </section>
   );

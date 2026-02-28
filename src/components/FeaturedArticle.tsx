@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import articlePlaceholder from "@/assets/article-placeholder.jpg";
 
 export interface ArticleData {
   id: string;
@@ -15,25 +16,27 @@ export interface ArticleData {
 
 const FeaturedArticle = ({ article }: { article: ArticleData }) => {
   return (
-    <article className="py-10">
-      <div className="container">
-        <h1 className="mt-3 font-heading text-4xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl">
+    <article className="relative overflow-hidden">
+      <div className="aspect-[21/9] w-full">
+        <img
+          src={article.imageUrl || articlePlaceholder}
+          alt={article.title}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+      </div>
+      <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-12 lg:p-20">
+        <span className="text-[10px] uppercase tracking-[0.2em] text-primary font-medium">{article.category}</span>
+        <h1 className="mt-2 font-heading text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1]">
           <Link to={`/article/${article.id}`} className="text-foreground no-underline hover:text-primary transition-colors">
             {article.title}
           </Link>
         </h1>
-        {article.imageUrl && (
-          <img src={article.imageUrl} alt={article.title} className="mt-4 w-full max-h-96 object-cover" />
-        )}
-        <p className="mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-          {article.excerpt}
-        </p>
-        <div className="mt-4 flex items-center gap-3 text-sm text-muted-foreground">
+        <p className="mt-3 text-sm text-muted-foreground max-w-xl">{article.excerpt}</p>
+        <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
           <span>{article.author}</span>
-          <span>·</span>
+          <span className="w-1 h-1 rounded-full bg-muted-foreground" />
           <span>{article.readTime} read</span>
-          <span>·</span>
-          <time>{new Date(article.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</time>
         </div>
       </div>
     </article>
