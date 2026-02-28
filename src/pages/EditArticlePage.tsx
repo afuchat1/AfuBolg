@@ -19,7 +19,6 @@ const EditArticlePage = () => {
     title: "",
     content: "",
     excerpt: "",
-    image_url: "",
     read_time: "3 min",
     published: false,
   });
@@ -35,7 +34,7 @@ const EditArticlePage = () => {
   const fetchArticle = async () => {
     const { data, error } = await supabase.from("articles").select("*").eq("id", id!).maybeSingle();
     if (error || !data) {
-      toast.error("Article not found or access denied");
+      toast.error("Article not found");
       navigate("/dashboard");
       return;
     }
@@ -43,7 +42,6 @@ const EditArticlePage = () => {
       title: data.title,
       content: data.content,
       excerpt: data.excerpt || "",
-      image_url: data.image_url || "",
       read_time: data.read_time || "3 min",
       published: data.published,
     });
@@ -60,16 +58,11 @@ const EditArticlePage = () => {
   const save = async (pub?: boolean) => {
     if (!article.title) { toast.error("Title required"); return; }
     setSaving(true);
-
     const updates: any = {
-      title: article.title,
-      content: article.content,
-      excerpt: article.excerpt || null,
-      image_url: article.image_url || null,
-      read_time: article.read_time,
+      title: article.title, content: article.content,
+      excerpt: article.excerpt || null, read_time: article.read_time,
     };
     if (pub !== undefined) updates.published = pub;
-
     const { error } = await supabase.from("articles").update(updates).eq("id", id!);
     if (error) toast.error(error.message);
     else {
@@ -90,22 +83,19 @@ const EditArticlePage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <div className="flex-1 container py-4 sm:py-6">
-        <div className="flex items-center justify-between mb-6">
-          <button onClick={() => navigate("/dashboard")} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft size={16} />
-            <span className="hidden sm:inline">Dashboard</span>
+      <div className="flex-1 px-6 sm:px-12 lg:px-20 py-6">
+        <div className="flex items-center justify-between mb-8">
+          <button onClick={() => navigate("/dashboard")} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft size={14} /> Back
           </button>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground hidden sm:inline">{wordCount} words</span>
-            <button onClick={() => save()} disabled={saving} className="flex items-center gap-1.5 bg-secondary text-foreground px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50">
-              <Save size={14} />
-              Save
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] text-muted-foreground hidden sm:inline">{wordCount} words</span>
+            <button onClick={() => save()} disabled={saving} className="flex items-center gap-1.5 border border-border text-foreground px-4 py-1.5 text-xs font-medium hover:bg-secondary transition-colors disabled:opacity-50">
+              <Save size={12} /> Save
             </button>
             {!article.published && (
-              <button onClick={() => save(true)} disabled={saving} className="flex items-center gap-1.5 bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
-                <Send size={14} />
-                Publish
+              <button onClick={() => save(true)} disabled={saving} className="flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-1.5 text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
+                <Send size={12} /> Publish
               </button>
             )}
           </div>
@@ -127,43 +117,30 @@ const EditArticlePage = () => {
           />
         </div>
 
-        <input
-          type="text"
-          value={article.title}
-          onChange={(e) => setArticle({ ...article, title: e.target.value })}
-          placeholder="Article title..."
-          className="w-full bg-transparent text-foreground font-heading text-2xl sm:text-4xl font-bold outline-none mb-4 placeholder:text-muted-foreground/40"
-        />
-
-        <div className="mb-4">
+        <div className="max-w-3xl mx-auto">
           <input
-            type="url"
-            value={article.image_url}
-            onChange={(e) => setArticle({ ...article, image_url: e.target.value })}
-            placeholder="Cover image URL (optional)"
-            className="w-full bg-secondary text-foreground px-3 py-2 text-sm outline-none rounded placeholder:text-muted-foreground/50"
+            type="text"
+            value={article.title}
+            onChange={(e) => setArticle({ ...article, title: e.target.value })}
+            placeholder="Article title..."
+            className="w-full bg-transparent text-foreground font-heading text-2xl sm:text-4xl font-bold outline-none mb-4 placeholder:text-muted-foreground/30"
           />
-          {article.image_url && (
-            <img src={article.image_url} alt="Cover" className="mt-2 w-full max-h-48 object-cover rounded" />
-          )}
-        </div>
 
-        <div className="mb-4">
           <textarea
             value={article.excerpt}
             onChange={(e) => setArticle({ ...article, excerpt: e.target.value })}
             rows={2}
             placeholder="Short summary..."
-            className="w-full bg-secondary text-foreground px-3 py-2 text-sm outline-none resize-none rounded placeholder:text-muted-foreground/50"
+            className="w-full bg-transparent text-muted-foreground text-sm outline-none resize-none mb-6 placeholder:text-muted-foreground/30 border-b border-border pb-4"
+          />
+
+          <RichTextEditor
+            content={article.content}
+            onChange={(html) => setArticle({ ...article, content: html })}
+            onAutoSave={() => save()}
+            wordCount={wordCount}
           />
         </div>
-
-        <RichTextEditor
-          content={article.content}
-          onChange={(html) => setArticle({ ...article, content: html })}
-          onAutoSave={() => save()}
-          wordCount={wordCount}
-        />
       </div>
       <PageFooter pageName="Edit Article" relatedLinks={[{ label: "Dashboard", href: "/dashboard" }, { label: "Home", href: "/" }]} />
     </div>

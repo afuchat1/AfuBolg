@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import PageFooter from "@/components/PageFooter";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import { Link } from "react-router-dom";
+import ArticleCard from "@/components/ArticleCard";
 import type { Tables } from "@/integrations/supabase/types";
 
 type DbArticle = Tables<"articles">;
@@ -15,7 +15,8 @@ const ArchivePage = () => {
   useEffect(() => {
     const fetch = async () => {
       const { data } = await supabase.from("articles").select("*").eq("published", true).order("created_at", { ascending: false });
-      setArticles(data || []); setLoading(false);
+      setArticles(data || []);
+      setLoading(false);
     };
     fetch();
   }, []);
@@ -30,38 +31,36 @@ const ArchivePage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 py-10">
-        <div className="container">
-          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Archive" }]} />
-          <h1 className="font-heading text-4xl font-bold tracking-tight">Archive</h1>
-          <p className="mt-3 text-muted-foreground">Browse all published articles by date.</p>
-          {loading ? (
-            <div className="mt-8"><div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>
-          ) : (
-            <div className="mt-8 space-y-10">
-              {Object.entries(grouped).map(([monthYear, monthArticles]) => (
-                <section key={monthYear}>
-                  <h2 className="font-heading text-xs font-medium uppercase tracking-widest text-primary mb-4">{monthYear}</h2>
-                  <div className="space-y-0">
-                    {monthArticles.map((article, i) => (
-                      <div key={article.id}>
-                        {i > 0 && <div className="h-px bg-muted my-4" />}
-                        <div className="flex items-baseline justify-between gap-4">
-                          <h3 className="font-heading text-base font-semibold truncate min-w-0">
-                            <Link to={`/article/${article.id}`} className="text-foreground no-underline hover:text-primary transition-colors">{article.title}</Link>
-                          </h3>
-                          <time className="text-xs text-muted-foreground whitespace-nowrap">
-                            {new Date(article.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                          </time>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-          )}
-        </div>
+      <main className="flex-1 py-10 px-6 sm:px-12 lg:px-20">
+        <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "All Stories" }]} />
+        <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight mt-4">All Stories</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Browse all published articles.</p>
+        {loading ? (
+          <div className="mt-8"><div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>
+        ) : (
+          <div className="mt-10 space-y-12">
+            {Object.entries(grouped).map(([monthYear, monthArticles]) => (
+              <section key={monthYear}>
+                <h2 className="text-[10px] font-medium uppercase tracking-[0.2em] text-primary mb-6">{monthYear}</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {monthArticles.map((a) => (
+                    <ArticleCard
+                      key={a.id}
+                      id={a.id}
+                      title={a.title}
+                      excerpt={a.excerpt || ""}
+                      category={a.category}
+                      author={a.author_name}
+                      date={a.created_at}
+                      readTime={a.read_time || "3 min"}
+                      imageUrl={a.image_url}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
       </main>
       <PageFooter pageName="Archive" relatedLinks={[{ label: "Home", href: "/" }, { label: "Search", href: "/search" }]} />
     </div>
