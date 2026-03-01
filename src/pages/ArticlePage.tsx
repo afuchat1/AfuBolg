@@ -6,6 +6,8 @@ import PageFooter from "@/components/PageFooter";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ArticleEngagement from "@/components/ArticleEngagement";
 import articlePlaceholder from "@/assets/article-placeholder.jpg";
+import { Calendar, User, Clock, ChevronLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 import type { Tables } from "@/integrations/supabase/types";
 
 type DbArticle = Tables<"articles">;
@@ -30,19 +32,25 @@ const ArticlePage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="h-10 w-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
       </div>
     );
   }
 
   if (!article) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-background">
         <Header />
-        <div className="flex-1 px-6 sm:px-10 lg:px-16 py-20">
-          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Not Found" }]} />
-          <p className="text-muted-foreground">Article not found.</p>
+        <div className="flex-1 px-6 sm:px-10 lg:px-16 py-20 max-w-4xl mx-auto w-full text-center">
+          <h1 className="font-heading text-4xl font-bold mb-4">Article Not Found</h1>
+          <p className="text-muted-foreground mb-8">The article you are looking for does not exist or has been removed.</p>
+          <Link to="/" className="inline-flex items-center gap-2 text-primary font-medium hover:underline">
+            <ChevronLeft size={16} /> Back to Home
+          </Link>
         </div>
         <PageFooter pageName="Article" relatedLinks={[{ label: "Home", href: "/" }]} />
       </div>
@@ -53,54 +61,79 @@ const ArticlePage = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      {/* Hero image — full bleed */}
-      <div className="relative w-full aspect-[21/9] max-h-[520px] overflow-hidden bg-muted">
-        <img
-          src={article.image_url || articlePlaceholder}
-          alt={article.title}
-          className="w-full h-full object-cover"
-        />
-      </div>
+      <main className="flex-1 pb-12 md:pb-20">
 
-      <article className="flex-1 px-6 sm:px-10 lg:px-16 py-12">
-        <div className="max-w-3xl mx-auto">
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: article.category, href: `/category/${article.category}` },
-              { label: article.title },
-            ]}
-          />
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary mt-6">
-            {article.category}
-          </span>
-          <h1 className="mt-3 font-heading text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold leading-[1.15] text-foreground">
-            {article.title}
-          </h1>
-          <div className="mt-5 flex items-center gap-3 text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">{article.author_name}</span>
-            <span className="w-1 h-1 rounded-full bg-border" />
-            <span>{article.read_time} read</span>
-            <span className="w-1 h-1 rounded-full bg-border" />
-            <time>
-              {new Date(article.created_at).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </time>
-          </div>
-          <div className="mt-10 h-px bg-border" />
-          <div
-            className="mt-10 prose max-w-none text-foreground/85 leading-[1.85] text-[16px]"
-            dangerouslySetInnerHTML={{ __html: article.content }}
+        {/* Full Bleed Hero image */}
+        <div className="relative w-full aspect-[21/9] max-h-[500px] bg-muted mb-10 md:mb-16">
+          <img
+            src={article.image_url || articlePlaceholder}
+            alt={article.title}
+            className="w-full h-full object-cover"
           />
         </div>
-      </article>
 
-      <section className="px-6 sm:px-10 lg:px-16">
-        <ArticleEngagement articleId={article.id} articleTitle={article.title} />
-      </section>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="mb-10 text-sm">
+            <Breadcrumbs
+              items={[
+                { label: "Home", href: "/" },
+                { label: article.category, href: `/category/${article.category}` },
+                { label: article.title },
+              ]}
+            />
+          </div>
+
+          <article>
+            {/* Article Header */}
+            <div className="mb-10">
+              <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-xs font-bold uppercase tracking-widest text-primary mb-6">
+                {article.category}
+              </span>
+
+              <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight text-foreground mb-8 text-left">
+                {article.title}
+              </h1>
+
+              <div className="flex flex-wrap items-center justify-start gap-6 text-sm text-muted-foreground font-medium">
+                <div className="flex items-center gap-2">
+                  <User size={16} className="text-muted-foreground/80" />
+                  <span className="text-foreground">{article.author_name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock size={16} className="text-muted-foreground/80" />
+                  <span>{article.read_time} read</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar size={16} className="text-muted-foreground/80" />
+                  <time>
+                    {new Date(article.created_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </time>
+                </div>
+              </div>
+            </div>
+
+            <div className="h-px bg-border/40 w-full mb-10" />
+
+            {/* Article Prose */}
+            <div
+              className="prose prose-lg max-w-none text-muted-foreground leading-relaxed prose-headings:font-heading prose-headings:font-bold prose-headings:text-foreground prose-a:text-primary hover:prose-a:text-primary/80 prose-strong:text-foreground prose-img:rounded-xl mb-16"
+              dangerouslySetInnerHTML={{ __html: article.content }}
+            />
+
+            {/* Divider below content */}
+            <div className="h-px bg-border/40 w-full mb-10" />
+
+            {/* Engagement Section */}
+            <div className="pb-8">
+              <ArticleEngagement articleId={article.id} articleTitle={article.title} />
+            </div>
+          </article>
+        </div>
+      </main>
 
       <PageFooter
         pageName="Article"
