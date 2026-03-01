@@ -1,100 +1,163 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { Search, Menu, X, PenSquare, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
+const categories = ["All", "Technology", "AI", "Science", "Innovation", "Product", "Community"];
+
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user } = useAuth();
+  const location = useLocation();
 
-  const pages = [
+  const navLinks = [
     { label: "Stories", href: "/archive" },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-      <div className="flex items-center justify-between px-6 sm:px-12 lg:px-20 h-14">
-        <Link to="/" className="font-heading text-lg font-bold tracking-tight text-foreground no-underline hover:opacity-100">
-          Afu<span className="text-primary">Blog</span>
-        </Link>
-
-        {/* Desktop nav */}
-        <nav className="hidden lg:flex items-center gap-6">
-          {pages.map((p) => (
-            <Link
-              key={p.label}
-              to={p.href}
-              className="text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground transition-colors no-underline"
-            >
-              {p.label}
-            </Link>
-          ))}
-          <Link to="/search" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Search">
-            <Search size={16} />
+    <>
+      {/* Top bar */}
+      <header className="sticky top-0 z-50 bg-background border-b border-border">
+        <div className="flex items-center justify-between px-6 sm:px-10 lg:px-16 h-16">
+          <Link
+            to="/"
+            className="font-heading text-xl font-extrabold tracking-tight text-foreground"
+          >
+            Afu<span className="text-primary">Blog</span>
           </Link>
-          {user ? (
-            <>
+
+          {/* Desktop nav */}
+          <nav className="hidden lg:flex items-center gap-8">
+            {navLinks.map((p) => (
               <Link
-                to="/write"
-                className="flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-1.5 text-xs font-medium uppercase tracking-wider hover:opacity-90 transition-opacity no-underline"
+                key={p.label}
+                to={p.href}
+                className={`text-sm font-medium transition-colors ${
+                  location.pathname === p.href
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
-                <PenSquare size={12} />
-                Write
+                {p.label}
               </Link>
-              <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors" title="Dashboard">
-                <LayoutDashboard size={16} />
-              </Link>
-            </>
-          ) : (
+            ))}
+          </nav>
+
+          <div className="hidden lg:flex items-center gap-3">
             <Link
-              to="/auth"
-              className="bg-primary text-primary-foreground px-4 py-1.5 text-xs font-medium uppercase tracking-wider hover:opacity-90 transition-opacity no-underline"
+              to="/search"
+              className="text-muted-foreground hover:text-foreground transition-colors p-2"
+              aria-label="Search"
             >
-              Sign In
+              <Search size={18} />
             </Link>
-          )}
-        </nav>
-
-        {/* Mobile toggle */}
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="lg:hidden text-muted-foreground hover:text-foreground transition-colors"
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      </div>
-
-      {/* Mobile nav */}
-      {mobileOpen && (
-        <nav className="lg:hidden border-t border-border bg-background px-6 py-4 flex flex-col gap-3 animate-fade-in">
-          {pages.map((p) => (
-            <Link key={p.label} to={p.href} onClick={() => setMobileOpen(false)} className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline py-1">
-              {p.label}
-            </Link>
-          ))}
-          <Link to="/search" onClick={() => setMobileOpen(false)} className="text-sm text-muted-foreground hover:text-foreground transition-colors no-underline py-1">
-            Search
-          </Link>
-          {user ? (
-            <>
-              <Link to="/write" onClick={() => setMobileOpen(false)} className="flex items-center gap-1.5 bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium hover:opacity-90 no-underline w-fit">
-                <PenSquare size={14} /> Write
+            {user ? (
+              <>
+                <Link
+                  to="/write"
+                  className="flex items-center gap-1.5 bg-primary text-primary-foreground px-5 py-2 text-sm font-semibold rounded-full hover:opacity-90 transition-opacity"
+                >
+                  <PenSquare size={14} />
+                  Write
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className="text-muted-foreground hover:text-foreground transition-colors p-2"
+                  title="Dashboard"
+                >
+                  <LayoutDashboard size={18} />
+                </Link>
+              </>
+            ) : (
+              <Link
+                to="/auth"
+                className="bg-foreground text-background px-5 py-2 text-sm font-semibold rounded-full hover:opacity-90 transition-opacity"
+              >
+                Sign In
               </Link>
-              <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="text-sm text-muted-foreground hover:text-foreground no-underline py-1">
-                Dashboard
+            )}
+          </div>
+
+          {/* Mobile toggle */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="lg:hidden text-foreground p-2"
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
+
+        {/* Category strip — desktop only, shown on home */}
+        {location.pathname === "/" && (
+          <div className="hidden lg:block border-t border-border">
+            <div className="flex items-center gap-1 px-6 sm:px-10 lg:px-16 py-2 overflow-x-auto">
+              {categories.map((cat) => (
+                <Link
+                  key={cat}
+                  to={cat === "All" ? "/archive" : `/category/${cat}`}
+                  className="px-4 py-1.5 text-xs font-medium rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary transition-all whitespace-nowrap"
+                >
+                  {cat}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Mobile nav */}
+        {mobileOpen && (
+          <nav className="lg:hidden border-t border-border bg-background px-6 py-5 flex flex-col gap-4 animate-fade-in">
+            {navLinks.map((p) => (
+              <Link
+                key={p.label}
+                to={p.href}
+                onClick={() => setMobileOpen(false)}
+                className="text-sm font-medium text-foreground py-1"
+              >
+                {p.label}
               </Link>
-            </>
-          ) : (
-            <Link to="/auth" onClick={() => setMobileOpen(false)} className="bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium hover:opacity-90 no-underline w-fit">
-              Sign In
+            ))}
+            <Link
+              to="/search"
+              onClick={() => setMobileOpen(false)}
+              className="text-sm font-medium text-foreground py-1"
+            >
+              Search
             </Link>
-          )}
-        </nav>
-      )}
-    </header>
+            <div className="h-px bg-border" />
+            {user ? (
+              <>
+                <Link
+                  to="/write"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 text-sm font-semibold rounded-full w-fit"
+                >
+                  <PenSquare size={14} /> Write
+                </Link>
+                <Link
+                  to="/dashboard"
+                  onClick={() => setMobileOpen(false)}
+                  className="text-sm font-medium text-foreground py-1"
+                >
+                  Dashboard
+                </Link>
+              </>
+            ) : (
+              <Link
+                to="/auth"
+                onClick={() => setMobileOpen(false)}
+                className="bg-foreground text-background px-4 py-2.5 text-sm font-semibold rounded-full w-fit"
+              >
+                Sign In
+              </Link>
+            )}
+          </nav>
+        )}
+      </header>
+    </>
   );
 };
 
