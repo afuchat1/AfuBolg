@@ -6,6 +6,7 @@ import PageFooter from "@/components/PageFooter";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import articlePlaceholder from "@/assets/article-placeholder.jpg";
 import type { Tables } from "@/integrations/supabase/types";
+import ArticleEngagement from "@/components/ArticleEngagement";
 
 type DbArticle = Tables<"articles">;
 
@@ -89,6 +90,10 @@ const ArticlePage = () => {
           />
         </div>
       </article>
+
+      <section className="px-6 sm:px-12 lg:px-20">
+        <ArticleEngagement articleId={article.id} articleTitle={article.title} />
+      </section>
 
       <PageFooter
         pageName="Article"
