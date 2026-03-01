@@ -69,7 +69,7 @@ const ContactPage = () => {
               </div>
               <div>
                 <h3 className="text-xs uppercase tracking-widest text-primary mb-2">Careers</h3>
-                <p>careers@afuchat.com</p>
+                <p>career@afuchat.com</p>
               </div>
             </div>
           </div>
