@@ -43,10 +43,10 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      {/* Hero Carousel */}
+      {/* Hero */}
       <HeroCarousel
         articles={featured.map((a) => ({
           id: a.id,
@@ -58,12 +58,18 @@ const Index = () => {
         }))}
       />
 
-      {/* Top Stories Grid */}
+      {/* Latest Stories */}
       {topStories.length > 0 && (
-        <section className="py-12 px-6 sm:px-12 lg:px-20">
-          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-8">
-            Latest Stories
-          </h2>
+        <section className="py-16 px-6 sm:px-10 lg:px-16">
+          <div className="flex items-center justify-between mb-10">
+            <h2 className="font-heading text-2xl font-bold text-foreground">Latest Stories</h2>
+            <a
+              href="/archive"
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              View All →
+            </a>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {topStories.map((a) => (
               <ArticleCard
@@ -82,15 +88,12 @@ const Index = () => {
         </section>
       )}
 
-      {/* Divider */}
-      {moreStories.length > 0 && <div className="h-px bg-border mx-6 sm:mx-12 lg:mx-20" />}
-
       {/* More Stories + Sidebar */}
       {moreStories.length > 0 && (
-        <section className="py-12 px-6 sm:px-12 lg:px-20">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-12">
+        <section className="py-16 px-6 sm:px-10 lg:px-16 bg-secondary">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-12">
             <div>
-              <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-8">
+              <h2 className="font-heading text-2xl font-bold text-foreground mb-10">
                 More Stories
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
@@ -113,7 +116,7 @@ const Index = () => {
             {/* Sidebar */}
             {sideStories.length > 0 && (
               <aside className="hidden lg:block">
-                <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-6">
+                <h2 className="font-heading text-lg font-bold text-foreground mb-6">
                   Trending
                 </h2>
                 <div className="divide-y divide-border">
