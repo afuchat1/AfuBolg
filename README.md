@@ -49,7 +49,7 @@ Wait for review: All PRs require at least 1 approval before merging.
 Project uses TypeScript + React.  
 Keep component structure simple — follow existing patterns.  
 Avoid installing unnecessary packages or styling libraries.  
-Commit messages should be clear, e.g., `Update blog post about AfuCloud`.
+Commit messages should be clear, e.g., `Update blog post about AfuChat`.
 
 ## 5️⃣ Contact / Questions
 
