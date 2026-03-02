@@ -16,7 +16,6 @@ serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
 
-    // Verify the caller is an admin
     const authHeader = req.headers.get("Authorization")!;
     const token = authHeader.replace("Bearer ", "");
     const { data: { user }, error: authError } = await createClient(
@@ -31,7 +30,6 @@ serve(async (req) => {
       });
     }
 
-    // Check if caller is admin
     const { data: callerRole } = await supabaseAdmin
       .from("user_roles")
       .select("role")
@@ -49,10 +47,9 @@ serve(async (req) => {
     const { email, action } = await req.json();
 
     if (action === "add") {
-      // Find user by email
       const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
       const targetUser = users?.find((u: any) => u.email === email);
-      
+
       if (!targetUser) {
         return new Response(JSON.stringify({ error: "User not found. They must sign up first." }), {
           status: 404,
@@ -82,7 +79,6 @@ serve(async (req) => {
         .select("id, user_id, role")
         .eq("role", "admin");
 
-      // Enrich with emails
       const { data: { users } } = await supabaseAdmin.auth.admin.listUsers();
       const enriched = (roles || []).map((r: any) => ({
         ...r,
@@ -98,8 +94,9 @@ serve(async (req) => {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Internal server error";
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

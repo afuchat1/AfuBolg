@@ -11,7 +11,7 @@ import type { Tables } from "@/integrations/supabase/types";
 type DbArticle = Tables<"articles">;
 
 const ArticlePage = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const [article, setArticle] = useState<DbArticle | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -20,13 +20,13 @@ const ArticlePage = () => {
       const { data } = await supabase
         .from("articles")
         .select("*")
-        .eq("id", id!)
+        .eq("slug", slug!)
         .maybeSingle();
       setArticle(data);
       setLoading(false);
     };
     fetch();
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -53,48 +53,24 @@ const ArticlePage = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      {/* Hero image — full bleed */}
       <div className="relative w-full aspect-[21/9] max-h-[520px] overflow-hidden bg-muted">
-        <img
-          src={article.image_url || articlePlaceholder}
-          alt={article.title}
-          className="w-full h-full object-cover"
-        />
+        <img src={article.image_url || articlePlaceholder} alt={article.title} className="w-full h-full object-cover" />
       </div>
 
       <article className="flex-1 px-6 sm:px-10 lg:px-16 py-12">
         <div className="max-w-3xl mx-auto">
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: article.category, href: `/category/${article.category}` },
-              { label: article.title },
-            ]}
-          />
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary mt-6">
-            {article.category}
-          </span>
-          <h1 className="mt-3 font-heading text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold leading-[1.15] text-foreground">
-            {article.title}
-          </h1>
+          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: article.category, href: `/category/${article.category}` }, { label: article.title }]} />
+          <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary mt-6">{article.category}</span>
+          <h1 className="mt-3 font-heading text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold leading-[1.15] text-foreground">{article.title}</h1>
           <div className="mt-5 flex items-center gap-3 text-sm text-muted-foreground">
             <span className="font-semibold text-foreground">{article.author_name}</span>
             <span className="w-1 h-1 rounded-full bg-border" />
             <span>{article.read_time} read</span>
             <span className="w-1 h-1 rounded-full bg-border" />
-            <time>
-              {new Date(article.created_at).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </time>
+            <time>{new Date(article.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</time>
           </div>
           <div className="mt-10 h-px bg-border" />
-          <div
-            className="mt-10 prose max-w-none text-foreground/85 leading-[1.85] text-[16px]"
-            dangerouslySetInnerHTML={{ __html: article.content }}
-          />
+          <div className="mt-10 prose max-w-none text-foreground/85 leading-[1.85] text-[16px]" dangerouslySetInnerHTML={{ __html: article.content }} />
         </div>
       </article>
 
@@ -102,14 +78,7 @@ const ArticlePage = () => {
         <ArticleEngagement articleId={article.id} articleTitle={article.title} />
       </section>
 
-      <PageFooter
-        pageName="Article"
-        relatedLinks={[
-          { label: "Home", href: "/" },
-          { label: "Archive", href: "/archive" },
-          { label: "Search", href: "/search" },
-        ]}
-      />
+      <PageFooter pageName="Article" relatedLinks={[{ label: "Home", href: "/" }, { label: "Archive", href: "/archive" }, { label: "Search", href: "/search" }]} />
     </div>
   );
 };

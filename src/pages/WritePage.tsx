@@ -25,10 +25,7 @@ const WritePage = () => {
     if (!authLoading && !user) navigate("/auth");
   }, [user, authLoading, navigate]);
 
-  const wordCount = article.content
-    .replace(/<[^>]*>/g, " ")
-    .split(/\s+/)
-    .filter(Boolean).length;
+  const wordCount = article.content.replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolean).length;
 
   useEffect(() => {
     const mins = Math.max(1, Math.ceil(wordCount / 200));
@@ -64,7 +61,7 @@ const WritePage = () => {
         author_id: user!.id,
         author_name: user!.user_metadata?.display_name || user!.email || "Anonymous",
         published: false, featured: false, category: "General",
-      }).select("id").single();
+      } as any).select("id").single();
       if (error) toast.error(error.message);
       else { setDraftId(data.id); toast.success("Draft created"); }
     }
@@ -90,7 +87,7 @@ const WritePage = () => {
         author_id: user!.id,
         author_name: user!.user_metadata?.display_name || user!.email || "Anonymous",
         published: true, featured: false, category: "General",
-      });
+      } as any);
       if (error) toast.error(error.message);
       else { toast.success("Published!"); navigate("/dashboard"); }
     }
@@ -109,15 +106,12 @@ const WritePage = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <div className="flex-1 px-6 sm:px-12 lg:px-20 py-6">
-        {/* Top bar */}
         <div className="flex items-center justify-between mb-8">
           <button onClick={() => navigate("/dashboard")} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft size={14} /> Back
           </button>
           <div className="flex items-center gap-3">
-            <span className="text-[10px] text-muted-foreground hidden sm:inline">
-              {wordCount} words · {article.read_time} read
-            </span>
+            <span className="text-[10px] text-muted-foreground hidden sm:inline">{wordCount} words · {article.read_time} read</span>
             <button onClick={saveDraft} disabled={saving} className="flex items-center gap-1.5 border border-border text-foreground px-4 py-1.5 text-xs font-medium hover:bg-secondary transition-colors disabled:opacity-50">
               <Save size={12} /> Save Draft
             </button>
@@ -127,49 +121,16 @@ const WritePage = () => {
           </div>
         </div>
 
-        {/* AI Tools */}
         <div className="mb-6">
-          <AITools
-            currentContent={article.content}
-            currentTitle={article.title}
-            onGenerated={(data) => {
-              setArticle(prev => ({
-                ...prev,
-                ...(data.title && { title: data.title }),
-                ...(data.content && { content: data.content }),
-                ...(data.excerpt && { excerpt: data.excerpt }),
-                ...(data.readTime && { read_time: data.readTime }),
-              }));
-            }}
-          />
+          <AITools currentContent={article.content} currentTitle={article.title} onGenerated={(data) => {
+            setArticle(prev => ({ ...prev, ...(data.title && { title: data.title }), ...(data.content && { content: data.content }), ...(data.excerpt && { excerpt: data.excerpt }), ...(data.readTime && { read_time: data.readTime }) }));
+          }} />
         </div>
 
-        {/* Title */}
         <div className="max-w-3xl mx-auto">
-          <input
-            type="text"
-            value={article.title}
-            onChange={(e) => setArticle({ ...article, title: e.target.value })}
-            placeholder="Article title..."
-            className="w-full bg-transparent text-foreground font-heading text-2xl sm:text-4xl font-bold outline-none mb-4 placeholder:text-muted-foreground/30"
-          />
-
-          {/* Excerpt */}
-          <textarea
-            value={article.excerpt}
-            onChange={(e) => setArticle({ ...article, excerpt: e.target.value })}
-            rows={2}
-            placeholder="Short summary (auto-generated if left empty)..."
-            className="w-full bg-transparent text-muted-foreground text-sm outline-none resize-none mb-6 placeholder:text-muted-foreground/30 border-b border-border pb-4"
-          />
-
-          {/* Editor */}
-          <RichTextEditor
-            content={article.content}
-            onChange={(html) => setArticle({ ...article, content: html })}
-            onAutoSave={draftId ? saveDraft : undefined}
-            wordCount={wordCount}
-          />
+          <input type="text" value={article.title} onChange={(e) => setArticle({ ...article, title: e.target.value })} placeholder="Article title..." className="w-full bg-transparent text-foreground font-heading text-2xl sm:text-4xl font-bold outline-none mb-4 placeholder:text-muted-foreground/30" />
+          <textarea value={article.excerpt} onChange={(e) => setArticle({ ...article, excerpt: e.target.value })} rows={2} placeholder="Short summary (auto-generated if left empty)..." className="w-full bg-transparent text-muted-foreground text-sm outline-none resize-none mb-6 placeholder:text-muted-foreground/30 border-b border-border pb-4" />
+          <RichTextEditor content={article.content} onChange={(html) => setArticle({ ...article, content: html })} onAutoSave={draftId ? saveDraft : undefined} wordCount={wordCount} />
         </div>
       </div>
       <PageFooter pageName="Write" relatedLinks={[{ label: "Dashboard", href: "/dashboard" }, { label: "Home", href: "/" }]} />

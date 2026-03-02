@@ -11,10 +11,11 @@ import { ArrowLeft, Save, Send } from "lucide-react";
 
 const EditArticlePage = () => {
   const { user, loading: authLoading } = useAuth();
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [articleId, setArticleId] = useState<string | null>(null);
   const [article, setArticle] = useState({
     title: "",
     content: "",
@@ -28,16 +29,17 @@ const EditArticlePage = () => {
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
-    if (user && id) fetchArticle();
-  }, [user, id]);
+    if (user && slug) fetchArticle();
+  }, [user, slug]);
 
   const fetchArticle = async () => {
-    const { data, error } = await supabase.from("articles").select("*").eq("id", id!).maybeSingle();
+    const { data, error } = await supabase.from("articles").select("*").eq("slug", slug!).maybeSingle();
     if (error || !data) {
       toast.error("Article not found");
       navigate("/dashboard");
       return;
     }
+    setArticleId(data.id);
     setArticle({
       title: data.title,
       content: data.content,
@@ -56,14 +58,14 @@ const EditArticlePage = () => {
   }, [wordCount]);
 
   const save = async (pub?: boolean) => {
-    if (!article.title) { toast.error("Title required"); return; }
+    if (!article.title || !articleId) { toast.error("Title required"); return; }
     setSaving(true);
     const updates: any = {
       title: article.title, content: article.content,
       excerpt: article.excerpt || null, read_time: article.read_time,
     };
     if (pub !== undefined) updates.published = pub;
-    const { error } = await supabase.from("articles").update(updates).eq("id", id!);
+    const { error } = await supabase.from("articles").update(updates).eq("id", articleId);
     if (error) toast.error(error.message);
     else {
       toast.success(pub ? "Published!" : "Saved");
@@ -102,44 +104,15 @@ const EditArticlePage = () => {
         </div>
 
         <div className="mb-6">
-          <AITools
-            currentContent={article.content}
-            currentTitle={article.title}
-            onGenerated={(data) => {
-              setArticle(prev => ({
-                ...prev,
-                ...(data.title && { title: data.title }),
-                ...(data.content && { content: data.content }),
-                ...(data.excerpt && { excerpt: data.excerpt }),
-                ...(data.readTime && { read_time: data.readTime }),
-              }));
-            }}
-          />
+          <AITools currentContent={article.content} currentTitle={article.title} onGenerated={(data) => {
+            setArticle(prev => ({ ...prev, ...(data.title && { title: data.title }), ...(data.content && { content: data.content }), ...(data.excerpt && { excerpt: data.excerpt }), ...(data.readTime && { read_time: data.readTime }) }));
+          }} />
         </div>
 
         <div className="max-w-3xl mx-auto">
-          <input
-            type="text"
-            value={article.title}
-            onChange={(e) => setArticle({ ...article, title: e.target.value })}
-            placeholder="Article title..."
-            className="w-full bg-transparent text-foreground font-heading text-2xl sm:text-4xl font-bold outline-none mb-4 placeholder:text-muted-foreground/30"
-          />
-
-          <textarea
-            value={article.excerpt}
-            onChange={(e) => setArticle({ ...article, excerpt: e.target.value })}
-            rows={2}
-            placeholder="Short summary..."
-            className="w-full bg-transparent text-muted-foreground text-sm outline-none resize-none mb-6 placeholder:text-muted-foreground/30 border-b border-border pb-4"
-          />
-
-          <RichTextEditor
-            content={article.content}
-            onChange={(html) => setArticle({ ...article, content: html })}
-            onAutoSave={() => save()}
-            wordCount={wordCount}
-          />
+          <input type="text" value={article.title} onChange={(e) => setArticle({ ...article, title: e.target.value })} placeholder="Article title..." className="w-full bg-transparent text-foreground font-heading text-2xl sm:text-4xl font-bold outline-none mb-4 placeholder:text-muted-foreground/30" />
+          <textarea value={article.excerpt} onChange={(e) => setArticle({ ...article, excerpt: e.target.value })} rows={2} placeholder="Short summary..." className="w-full bg-transparent text-muted-foreground text-sm outline-none resize-none mb-6 placeholder:text-muted-foreground/30 border-b border-border pb-4" />
+          <RichTextEditor content={article.content} onChange={(html) => setArticle({ ...article, content: html })} onAutoSave={() => save()} wordCount={wordCount} />
         </div>
       </div>
       <PageFooter pageName="Edit Article" relatedLinks={[{ label: "Dashboard", href: "/dashboard" }, { label: "Home", href: "/" }]} />

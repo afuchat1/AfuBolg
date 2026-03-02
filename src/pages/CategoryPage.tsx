@@ -24,7 +24,7 @@ const CategoryPage = () => {
   }, [category]);
 
   const mapArticle = (a: DbArticle) => ({
-    id: a.id, title: a.title, excerpt: a.excerpt || "", content: a.content,
+    id: a.id, slug: a.slug, title: a.title, excerpt: a.excerpt || "", content: a.content,
     category: a.category, author: a.author_name, date: a.created_at,
     readTime: a.read_time || "3 min", imageUrl: a.image_url,
   });
