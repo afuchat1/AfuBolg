@@ -39,9 +39,7 @@ const SearchPage = () => {
           <h1 className="font-heading text-4xl font-bold tracking-tight">Search</h1>
           <div className="mt-6 relative max-w-xl">
             <SearchIcon size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search articles..." autoFocus
-              className="w-full bg-secondary text-foreground pl-10 pr-4 py-3 text-sm outline-none focus:ring-1 focus:ring-primary" />
+            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search articles..." autoFocus className="w-full bg-secondary text-foreground pl-10 pr-4 py-3 text-sm outline-none focus:ring-1 focus:ring-primary" />
           </div>
           <div className="mt-8">
             {loading ? (
@@ -54,9 +52,7 @@ const SearchPage = () => {
                   <article key={article.id}>
                     {i > 0 && <div className="h-px bg-muted my-6" />}
                     <h3 className="font-heading text-xl font-semibold leading-snug">
-                      <Link to={`/article/${article.id}`} className="text-foreground no-underline hover:text-primary transition-colors">
-                        {article.title}
-                      </Link>
+                      <Link to={`/article/${article.slug}`} className="text-foreground no-underline hover:text-primary transition-colors">{article.title}</Link>
                     </h3>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-2">{article.excerpt}</p>
                     <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">

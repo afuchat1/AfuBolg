@@ -32,11 +32,11 @@ const App = () => (
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/article/:id" element={<ArticlePage />} />
+          <Route path="/article/:slug" element={<ArticlePage />} />
           <Route path="/category/:category" element={<CategoryPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/write" element={<WritePage />} />
-          <Route path="/edit/:id" element={<EditArticlePage />} />
+          <Route path="/edit/:slug" element={<EditArticlePage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/admins" element={<AdminManageAdmins />} />

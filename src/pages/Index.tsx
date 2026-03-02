@@ -46,10 +46,9 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      {/* Hero */}
       <HeroCarousel
         articles={featured.map((a) => ({
-          id: a.id,
+          slug: a.slug,
           title: a.title,
           excerpt: a.excerpt || "",
           category: a.category,
@@ -58,81 +57,37 @@ const Index = () => {
         }))}
       />
 
-      {/* Latest Stories */}
       {topStories.length > 0 && (
         <section className="py-16 px-6 sm:px-10 lg:px-16">
           <div className="flex items-center justify-between mb-10">
             <h2 className="font-heading text-2xl font-bold text-foreground">Latest Stories</h2>
-            <a
-              href="/archive"
-              className="text-sm font-medium text-primary hover:underline"
-            >
-              View All →
-            </a>
+            <a href="/archive" className="text-sm font-medium text-primary hover:underline">View All →</a>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {topStories.map((a) => (
-              <ArticleCard
-                key={a.id}
-                id={a.id}
-                title={a.title}
-                excerpt={a.excerpt || ""}
-                category={a.category}
-                author={a.author_name}
-                date={a.created_at}
-                readTime={a.read_time || "3 min"}
-                imageUrl={a.image_url}
-              />
+              <ArticleCard key={a.id} slug={a.slug} title={a.title} excerpt={a.excerpt || ""} category={a.category} author={a.author_name} date={a.created_at} readTime={a.read_time || "3 min"} imageUrl={a.image_url} />
             ))}
           </div>
         </section>
       )}
 
-      {/* More Stories + Sidebar */}
       {moreStories.length > 0 && (
         <section className="py-16 px-6 sm:px-10 lg:px-16 bg-secondary">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-12">
             <div>
-              <h2 className="font-heading text-2xl font-bold text-foreground mb-10">
-                More Stories
-              </h2>
+              <h2 className="font-heading text-2xl font-bold text-foreground mb-10">More Stories</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 {moreStories.map((a) => (
-                  <ArticleCard
-                    key={a.id}
-                    id={a.id}
-                    title={a.title}
-                    excerpt={a.excerpt || ""}
-                    category={a.category}
-                    author={a.author_name}
-                    date={a.created_at}
-                    readTime={a.read_time || "3 min"}
-                    imageUrl={a.image_url}
-                  />
+                  <ArticleCard key={a.id} slug={a.slug} title={a.title} excerpt={a.excerpt || ""} category={a.category} author={a.author_name} date={a.created_at} readTime={a.read_time || "3 min"} imageUrl={a.image_url} />
                 ))}
               </div>
             </div>
-
-            {/* Sidebar */}
             {sideStories.length > 0 && (
               <aside className="hidden lg:block">
-                <h2 className="font-heading text-lg font-bold text-foreground mb-6">
-                  Trending
-                </h2>
+                <h2 className="font-heading text-lg font-bold text-foreground mb-6">Trending</h2>
                 <div className="divide-y divide-border">
                   {sideStories.map((a) => (
-                    <ArticleCard
-                      key={a.id}
-                      id={a.id}
-                      title={a.title}
-                      excerpt={a.excerpt || ""}
-                      category={a.category}
-                      author={a.author_name}
-                      date={a.created_at}
-                      readTime={a.read_time || "3 min"}
-                      imageUrl={a.image_url}
-                      variant="compact"
-                    />
+                    <ArticleCard key={a.id} slug={a.slug} title={a.title} excerpt={a.excerpt || ""} category={a.category} author={a.author_name} date={a.created_at} readTime={a.read_time || "3 min"} imageUrl={a.image_url} variant="compact" />
                   ))}
                 </div>
               </aside>
@@ -147,14 +102,7 @@ const Index = () => {
         </div>
       )}
 
-      <PageFooter
-        pageName="Home"
-        relatedLinks={[
-          { label: "About", href: "/about" },
-          { label: "Archive", href: "/archive" },
-          { label: "Contact", href: "/contact" },
-        ]}
-      />
+      <PageFooter pageName="Home" relatedLinks={[{ label: "About", href: "/about" }, { label: "Archive", href: "/archive" }, { label: "Contact", href: "/contact" }]} />
     </div>
   );
 };

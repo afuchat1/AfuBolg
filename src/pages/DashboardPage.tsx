@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import PageFooter from "@/components/PageFooter";
-import { Plus, Edit, Trash2, Eye, EyeOff, Star, LogOut, Shield, PenSquare, BarChart3 } from "lucide-react";
+import { Edit, Trash2, Eye, EyeOff, LogOut, Shield, PenSquare } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Article = Tables<"articles">;
@@ -36,9 +36,12 @@ const DashboardPage = () => {
   };
 
   const fetchArticles = async () => {
+    if (!user) return;
+    // Each user only sees their own articles
     const { data, error } = await supabase
       .from("articles")
       .select("*")
+      .eq("author_id", user.id)
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
     else setArticles(data || []);
@@ -49,20 +52,11 @@ const DashboardPage = () => {
     if (!confirm("Delete this article permanently?")) return;
     const { error } = await supabase.from("articles").delete().eq("id", id);
     if (error) toast.error(error.message);
-    else {
-      toast.success("Deleted");
-      fetchArticles();
-    }
+    else { toast.success("Deleted"); fetchArticles(); }
   };
 
   const togglePublish = async (article: Article) => {
     const { error } = await supabase.from("articles").update({ published: !article.published }).eq("id", article.id);
-    if (error) toast.error(error.message);
-    else fetchArticles();
-  };
-
-  const toggleFeatured = async (article: Article) => {
-    const { error } = await supabase.from("articles").update({ featured: !article.featured }).eq("id", article.id);
     if (error) toast.error(error.message);
     else fetchArticles();
   };
@@ -77,7 +71,6 @@ const DashboardPage = () => {
     total: articles.length,
     published: articles.filter(a => a.published).length,
     drafts: articles.filter(a => !a.published).length,
-    featured: articles.filter(a => a.featured).length,
   };
 
   if (authLoading || loading) {
@@ -93,10 +86,10 @@ const DashboardPage = () => {
       <Header />
       <div className="flex-1 container py-4 sm:py-6">
         {/* Stats bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        <div className="grid grid-cols-3 gap-3 mb-6">
           <div className="bg-secondary p-3 rounded">
             <div className="text-2xl font-bold font-heading">{stats.total}</div>
-            <div className="text-xs text-muted-foreground">Total Articles</div>
+            <div className="text-xs text-muted-foreground">My Articles</div>
           </div>
           <div className="bg-secondary p-3 rounded">
             <div className="text-2xl font-bold font-heading text-primary">{stats.published}</div>
@@ -106,37 +99,22 @@ const DashboardPage = () => {
             <div className="text-2xl font-bold font-heading text-muted-foreground">{stats.drafts}</div>
             <div className="text-xs text-muted-foreground">Drafts</div>
           </div>
-          <div className="bg-secondary p-3 rounded">
-            <div className="text-2xl font-bold font-heading text-primary">{stats.featured}</div>
-            <div className="text-xs text-muted-foreground">Featured</div>
-          </div>
         </div>
 
         {/* Actions bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div className="flex items-center gap-2">
             <h1 className="font-heading text-xl sm:text-2xl font-bold">My Articles</h1>
-            {isAdmin && (
-              <span className="bg-primary/10 text-primary px-2 py-0.5 text-xs font-medium rounded">Admin</span>
-            )}
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            {/* Filter tabs */}
             <div className="flex bg-secondary rounded overflow-hidden text-xs">
               {(["all", "published", "drafts"] as const).map(f => (
-                <button
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  className={`px-3 py-1.5 capitalize transition-colors ${filter === f ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                >
+                <button key={f} onClick={() => setFilter(f)} className={`px-3 py-1.5 capitalize transition-colors ${filter === f ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}>
                   {f}
                 </button>
               ))}
             </div>
-            <Link
-              to="/write"
-              className="flex items-center gap-1.5 bg-primary text-primary-foreground px-3 py-1.5 text-xs sm:text-sm font-medium hover:opacity-90 transition-opacity no-underline"
-            >
+            <Link to="/write" className="flex items-center gap-1.5 bg-primary text-primary-foreground px-3 py-1.5 text-xs sm:text-sm font-medium hover:opacity-90 transition-opacity no-underline">
               <PenSquare size={14} />
               <span className="hidden sm:inline">New Article</span>
               <span className="sm:hidden">New</span>
@@ -159,12 +137,8 @@ const DashboardPage = () => {
             <p className="text-muted-foreground mb-4">
               {filter === "all" ? "No articles yet. Start writing!" : `No ${filter} articles.`}
             </p>
-            <Link
-              to="/write"
-              className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity no-underline"
-            >
-              <PenSquare size={16} />
-              Write Your First Article
+            <Link to="/write" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity no-underline">
+              <PenSquare size={16} /> Write Your First Article
             </Link>
           </div>
         ) : (
@@ -175,38 +149,21 @@ const DashboardPage = () => {
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      {!article.published && (
-                        <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">Draft</span>
-                      )}
-                      {article.published && (
-                        <span className="text-xs text-primary bg-primary/10 px-1.5 py-0.5 rounded">Live</span>
-                      )}
-                      {article.featured && (
-                        <Star size={12} className="text-primary fill-primary" />
-                      )}
-                      {isAdmin && article.author_id !== user?.id && (
-                        <span className="text-xs text-muted-foreground">by {article.author_name}</span>
-                      )}
+                      {!article.published && <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">Draft</span>}
+                      {article.published && <span className="text-xs text-primary bg-primary/10 px-1.5 py-0.5 rounded">Live</span>}
                     </div>
                     <h3 className="font-heading text-base sm:text-lg font-semibold truncate">
-                      <Link to={`/article/${article.id}`} className="text-foreground no-underline hover:text-primary transition-colors">
-                        {article.title}
-                      </Link>
+                      <Link to={`/article/${article.slug}`} className="text-foreground no-underline hover:text-primary transition-colors">{article.title}</Link>
                     </h3>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {new Date(article.created_at).toLocaleDateString()} · {article.read_time} · {article.content.replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolean).length} words
+                      {new Date(article.created_at).toLocaleDateString()} · {article.read_time}
                     </p>
                   </div>
                   <div className="flex items-center gap-0.5 shrink-0">
                     <button onClick={() => togglePublish(article)} className="p-2 text-muted-foreground hover:text-foreground transition-colors" title={article.published ? "Unpublish" : "Publish"}>
                       {article.published ? <Eye size={16} /> : <EyeOff size={16} />}
                     </button>
-                    {isAdmin && (
-                      <button onClick={() => toggleFeatured(article)} className="p-2 text-muted-foreground hover:text-primary transition-colors" title="Toggle featured">
-                        <Star size={16} className={article.featured ? "fill-primary text-primary" : ""} />
-                      </button>
-                    )}
-                    <button onClick={() => navigate(`/edit/${article.id}`)} className="p-2 text-muted-foreground hover:text-foreground transition-colors" title="Edit">
+                    <button onClick={() => navigate(`/edit/${article.slug}`)} className="p-2 text-muted-foreground hover:text-foreground transition-colors" title="Edit">
                       <Edit size={16} />
                     </button>
                     <button onClick={() => deleteArticle(article.id)} className="p-2 text-muted-foreground hover:text-destructive transition-colors" title="Delete">
@@ -219,14 +176,7 @@ const DashboardPage = () => {
           </div>
         )}
       </div>
-      <PageFooter
-        pageName="Dashboard"
-        relatedLinks={[
-          { label: "Home", href: "/" },
-          { label: "Write", href: "/write" },
-          ...(isAdmin ? [{ label: "Admin", href: "/admin" }] : []),
-        ]}
-      />
+      <PageFooter pageName="Dashboard" relatedLinks={[{ label: "Home", href: "/" }, { label: "Write", href: "/write" }]} />
     </div>
   );
 };

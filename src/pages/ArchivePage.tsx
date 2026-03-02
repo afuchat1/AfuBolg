@@ -44,17 +44,7 @@ const ArchivePage = () => {
                 <h2 className="text-[10px] font-medium uppercase tracking-[0.2em] text-primary mb-6">{monthYear}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {monthArticles.map((a) => (
-                    <ArticleCard
-                      key={a.id}
-                      id={a.id}
-                      title={a.title}
-                      excerpt={a.excerpt || ""}
-                      category={a.category}
-                      author={a.author_name}
-                      date={a.created_at}
-                      readTime={a.read_time || "3 min"}
-                      imageUrl={a.image_url}
-                    />
+                    <ArticleCard key={a.id} slug={a.slug} title={a.title} excerpt={a.excerpt || ""} category={a.category} author={a.author_name} date={a.created_at} readTime={a.read_time || "3 min"} imageUrl={a.image_url} />
                   ))}
                 </div>
               </section>
