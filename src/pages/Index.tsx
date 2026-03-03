@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import ArticleCard from "@/components/ArticleCard";
 import PageFooter from "@/components/PageFooter";
+import SEOHead from "@/components/SEOHead";
 import type { Tables } from "@/integrations/supabase/types";
 
 type DbArticle = Tables<"articles">;
@@ -44,8 +45,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead title="Home" description="AfuBlog — The official news and updates platform for AfuChat.com. Read the latest tech stories, AI insights, and more." url="https://stark-news-flow.lovable.app" />
       <Header />
-
       <HeroCarousel
         articles={featured.map((a) => ({
           slug: a.slug,
@@ -54,6 +55,7 @@ const Index = () => {
           category: a.category,
           author: a.author_name,
           date: a.created_at,
+          imageUrl: a.image_url,
         }))}
       />
 

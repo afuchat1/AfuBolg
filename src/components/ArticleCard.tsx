@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useCallback } from "react";
 import articlePlaceholder from "@/assets/article-placeholder.jpg";
 
 interface ArticleCardProps {
@@ -66,7 +67,7 @@ const ArticleCard = ({
       <h3 className="font-heading text-lg font-bold text-foreground mt-1.5 leading-snug line-clamp-2 group-hover:text-primary transition-colors">{title}</h3>
       <p className="text-sm text-muted-foreground mt-2 line-clamp-2 leading-relaxed">{excerpt}</p>
       <div className="flex items-center gap-2 text-xs text-muted-foreground mt-3">
-        <span className="font-medium text-foreground">{author}</span>
+        <Link to={`/writer/${author.toLowerCase().replace(/\s+/g, "-")}`} className="font-medium text-foreground hover:text-primary transition-colors no-underline" onClick={(e) => e.stopPropagation()}>{author}</Link>
         <span className="w-1 h-1 rounded-full bg-border" />
         <time>{new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</time>
         <span className="w-1 h-1 rounded-full bg-border" />
