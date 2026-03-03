@@ -50,8 +50,19 @@ const ArticlePage = () => {
     );
   }
 
+  const authorSlug = article.author_name.toLowerCase().replace(/\s+/g, "-");
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEOHead
+        title={article.title}
+        description={article.excerpt || article.title}
+        url={`https://stark-news-flow.lovable.app/article/${article.slug}`}
+        image={article.image_url || undefined}
+        type="article"
+        author={article.author_name}
+        publishedTime={article.created_at}
+      />
       <Header />
 
       <div className="relative w-full aspect-[21/9] max-h-[520px] overflow-hidden bg-muted">
