@@ -2,8 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import heroImg1 from "@/assets/hero-tech-1.jpg";
-import heroImg2 from "@/assets/hero-tech-2.jpg";
-import heroImg3 from "@/assets/hero-tech-3.jpg";
+import articlePlaceholder from "@/assets/article-placeholder.jpg";
 
 interface SlideArticle {
   slug: string;
@@ -45,9 +44,9 @@ const HeroCarousel = ({ articles }: { articles?: SlideArticle[] }) => {
 
   return (
     <section className="relative w-full aspect-[16/7] min-h-[420px] max-h-[680px] overflow-hidden bg-muted">
-      {heroImages.map((img, i) => (
+      {slides.map((s, i) => (
         <div key={i} className="absolute inset-0 transition-opacity duration-700 ease-in-out" style={{ opacity: current === i ? 1 : 0 }}>
-          <img src={img} alt="" className="w-full h-full object-cover" loading={i === 0 ? "eager" : "lazy"} />
+          <img src={s.imageUrl || heroImg1} alt={s.title} className="w-full h-full object-cover" loading={i === 0 ? "eager" : "lazy"} />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
         </div>
       ))}
