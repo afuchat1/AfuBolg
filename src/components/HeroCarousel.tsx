@@ -12,6 +12,7 @@ interface SlideArticle {
   category: string;
   author: string;
   date: string;
+  imageUrl?: string | null;
 }
 
 const fallbackSlides: SlideArticle[] = [
