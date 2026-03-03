@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { Search, Menu, X, PenSquare, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { ThemeToggle } from "./ThemeToggle";
 
 const categories = ["All", "Technology", "AI", "Science", "Innovation", "Product", "Community"];
 
@@ -34,11 +35,10 @@ const Header = () => {
               <Link
                 key={p.label}
                 to={p.href}
-                className={`text-sm font-medium transition-colors ${
-                  location.pathname === p.href
+                className={`text-sm font-medium transition-colors ${location.pathname === p.href
                     ? "text-foreground"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 {p.label}
               </Link>
@@ -53,6 +53,7 @@ const Header = () => {
             >
               <Search size={18} />
             </Link>
+            <ThemeToggle />
             {user ? (
               <>
                 <Link
@@ -120,13 +121,10 @@ const Header = () => {
                 {p.label}
               </Link>
             ))}
-            <Link
-              to="/search"
-              onClick={() => setMobileOpen(false)}
-              className="text-sm font-medium text-foreground py-1"
-            >
-              Search
-            </Link>
+            <div className="flex items-center justify-between py-1">
+              <span className="text-sm font-medium text-foreground">Theme</span>
+              <ThemeToggle />
+            </div>
             <div className="h-px bg-border" />
             {user ? (
               <>
