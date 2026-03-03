@@ -16,12 +16,10 @@ interface SlideArticle {
 }
 
 const fallbackSlides: SlideArticle[] = [
-  { slug: "", title: "Welcome to AfuBlog", excerpt: "The official tech newsroom for AfuChat — delivering AI insights, product updates, and the future of technology.", category: "Featured", author: "AfuChat", date: new Date().toISOString() },
-  { slug: "", title: "AI-Powered Writing Platform", excerpt: "Write, publish, and share your tech stories with the world. Powered by intelligent tools.", category: "Platform", author: "AfuChat", date: new Date().toISOString() },
-  { slug: "", title: "Join the Community", excerpt: "Be part of a growing network of tech writers, developers, and innovators.", category: "Community", author: "AfuChat", date: new Date().toISOString() },
+  { slug: "", title: "Welcome to AfuBlog", excerpt: "The official tech newsroom for AfuChat — delivering AI insights, product updates, and the future of technology.", category: "Featured", author: "AfuChat", date: new Date().toISOString(), imageUrl: null },
+  { slug: "", title: "AI-Powered Writing Platform", excerpt: "Write, publish, and share your tech stories with the world. Powered by intelligent tools.", category: "Platform", author: "AfuChat", date: new Date().toISOString(), imageUrl: null },
+  { slug: "", title: "Join the Community", excerpt: "Be part of a growing network of tech writers, developers, and innovators.", category: "Community", author: "AfuChat", date: new Date().toISOString(), imageUrl: null },
 ];
-
-const heroImages = [heroImg1, heroImg2, heroImg3];
 
 const HeroCarousel = ({ articles }: { articles?: SlideArticle[] }) => {
   const slides = articles && articles.length > 0 ? articles : fallbackSlides;
