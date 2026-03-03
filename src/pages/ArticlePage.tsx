@@ -1,10 +1,11 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import PageFooter from "@/components/PageFooter";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ArticleEngagement from "@/components/ArticleEngagement";
+import SEOHead from "@/components/SEOHead";
 import articlePlaceholder from "@/assets/article-placeholder.jpg";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -63,7 +64,7 @@ const ArticlePage = () => {
           <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary mt-6">{article.category}</span>
           <h1 className="mt-3 font-heading text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold leading-[1.15] text-foreground">{article.title}</h1>
           <div className="mt-5 flex items-center gap-3 text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">{article.author_name}</span>
+            <Link to={`/writer/${authorSlug}`} className="font-semibold text-foreground hover:text-primary transition-colors no-underline">{article.author_name}</Link>
             <span className="w-1 h-1 rounded-full bg-border" />
             <span>{article.read_time} read</span>
             <span className="w-1 h-1 rounded-full bg-border" />
