@@ -54,6 +54,7 @@ const Index = () => {
           category: a.category,
           author: a.author_name,
           date: a.created_at,
+          imageUrl: a.image_url,
         }))}
       />
 
