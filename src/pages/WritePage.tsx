@@ -8,12 +8,14 @@ import AITools from "@/components/AITools";
 import Header from "@/components/Header";
 import PageFooter from "@/components/PageFooter";
 import { ArrowLeft, Send, Save } from "lucide-react";
+import CoverImageUpload from "@/components/CoverImageUpload";
 
 const WritePage = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
   const [draftId, setDraftId] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [article, setArticle] = useState({
     title: "",
     content: "",
@@ -51,6 +53,7 @@ const WritePage = () => {
       const { error } = await supabase.from("articles").update({
         title: article.title, content: article.content,
         excerpt: article.excerpt, read_time: article.read_time,
+        image_url: imageUrl,
       }).eq("id", draftId);
       if (error) toast.error(error.message);
       else toast.success("Draft saved");
@@ -58,6 +61,7 @@ const WritePage = () => {
       const { data, error } = await supabase.from("articles").insert({
         title: article.title, content: article.content,
         excerpt: article.excerpt || null, read_time: article.read_time,
+        image_url: imageUrl,
         author_id: user!.id,
         author_name: user!.user_metadata?.display_name || user!.email || "Anonymous",
         published: false, featured: false, category: "General",
@@ -77,6 +81,7 @@ const WritePage = () => {
       const { error } = await supabase.from("articles").update({
         title: article.title, content: article.content,
         excerpt: article.excerpt, read_time: article.read_time, published: true,
+        image_url: imageUrl,
       }).eq("id", draftId);
       if (error) toast.error(error.message);
       else { toast.success("Published!"); navigate("/dashboard"); }
@@ -84,6 +89,7 @@ const WritePage = () => {
       const { error } = await supabase.from("articles").insert({
         title: article.title, content: article.content,
         excerpt: article.excerpt || null, read_time: article.read_time,
+        image_url: imageUrl,
         author_id: user!.id,
         author_name: user!.user_metadata?.display_name || user!.email || "Anonymous",
         published: true, featured: false, category: "General",
@@ -128,6 +134,7 @@ const WritePage = () => {
         </div>
 
         <div className="max-w-3xl mx-auto">
+          <CoverImageUpload imageUrl={imageUrl} userId={user!.id} onImageChange={setImageUrl} />
           <input type="text" value={article.title} onChange={(e) => setArticle({ ...article, title: e.target.value })} placeholder="Article title..." className="w-full bg-transparent text-foreground font-heading text-2xl sm:text-4xl font-bold outline-none mb-4 placeholder:text-muted-foreground/30" />
           <textarea value={article.excerpt} onChange={(e) => setArticle({ ...article, excerpt: e.target.value })} rows={2} placeholder="Short summary (auto-generated if left empty)..." className="w-full bg-transparent text-muted-foreground text-sm outline-none resize-none mb-6 placeholder:text-muted-foreground/30 border-b border-border pb-4" />
           <RichTextEditor content={article.content} onChange={(html) => setArticle({ ...article, content: html })} onAutoSave={draftId ? saveDraft : undefined} wordCount={wordCount} />
