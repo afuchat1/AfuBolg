@@ -51,6 +51,15 @@ const ArticlePage = () => {
   }
 
   const authorSlug = article.author_name.toLowerCase().replace(/\s+/g, "-");
+  const [authorAvatar, setAuthorAvatar] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (article?.author_id) {
+      supabase.from("profiles").select("avatar_url").eq("user_id", article.author_id).maybeSingle().then(({ data }) => {
+        if (data?.avatar_url) setAuthorAvatar(data.avatar_url);
+      });
+    }
+  }, [article]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -75,7 +84,16 @@ const ArticlePage = () => {
           <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary mt-6">{article.category}</span>
           <h1 className="mt-3 font-heading text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold leading-[1.15] text-foreground">{article.title}</h1>
           <div className="mt-5 flex items-center gap-3 text-sm text-muted-foreground">
-            <Link to={`/writer/${authorSlug}`} className="font-semibold text-foreground hover:text-primary transition-colors no-underline">{article.author_name}</Link>
+            <Link to={`/writer/${authorSlug}`} className="flex items-center gap-2 no-underline">
+              {authorAvatar ? (
+                <img src={authorAvatar} alt={article.author_name} className="w-8 h-8 rounded-full object-cover" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+                  <span className="text-xs font-bold text-muted-foreground">{article.author_name.charAt(0).toUpperCase()}</span>
+                </div>
+              )}
+              <span className="font-semibold text-foreground hover:text-primary transition-colors">{article.author_name}</span>
+            </Link>
             <span className="w-1 h-1 rounded-full bg-border" />
             <span>{article.read_time} read</span>
             <span className="w-1 h-1 rounded-full bg-border" />

@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { Search, Menu, X, PenSquare, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const categories = ["All", "Technology", "AI", "Science", "Innovation", "Product", "Community"];
 
@@ -45,7 +46,8 @@ const Header = () => {
             ))}
           </nav>
 
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2">
+            <ThemeToggle />
             <Link
               to="/search"
               className="text-muted-foreground hover:text-foreground transition-colors p-2"
