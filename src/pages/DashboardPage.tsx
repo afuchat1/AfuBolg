@@ -5,13 +5,13 @@ import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import PageFooter from "@/components/PageFooter";
-import { Edit, Trash2, Eye, EyeOff, LogOut, Shield, PenSquare, Settings } from "lucide-react";
+import { Edit, Trash2, Eye, EyeOff, Shield, PenSquare, Settings } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Article = Tables<"articles">;
 
 const DashboardPage = () => {
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
@@ -127,9 +127,6 @@ const DashboardPage = () => {
             <Link to="/settings" className="text-muted-foreground hover:text-primary transition-colors p-1.5" title="Settings">
               <Settings size={18} />
             </Link>
-            <button onClick={() => { signOut(); navigate("/"); }} className="text-muted-foreground hover:text-foreground transition-colors p-1.5" title="Sign out">
-              <LogOut size={18} />
-            </button>
           </div>
         </div>
 

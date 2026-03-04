@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import PageFooter from "@/components/PageFooter";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import SEOHead from "@/components/SEOHead";
-import { Camera, Save, User } from "lucide-react";
+import { Camera, Save, User, LogOut } from "lucide-react";
 
 const SettingsPage = () => {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -230,6 +230,19 @@ const SettingsPage = () => {
                 {changingPassword ? "Updating..." : "Update Password"}
               </button>
             </div>
+          </div>
+
+          {/* Sign Out */}
+          <div className="mt-12 pt-8 border-t border-border">
+            <h2 className="font-heading text-lg font-bold text-foreground">Session</h2>
+            <p className="text-sm text-muted-foreground mt-1">Sign out of your account on this device.</p>
+            <button
+              onClick={() => { signOut(); navigate("/"); }}
+              className="mt-4 flex items-center gap-2 border border-border text-foreground px-6 py-2.5 text-sm font-medium rounded hover:bg-secondary transition-colors"
+            >
+              <LogOut size={16} />
+              Sign Out
+            </button>
           </div>
 
           {/* Danger Zone */}
