@@ -15,6 +15,7 @@ const ArticlePage = () => {
   const { slug } = useParams();
   const [article, setArticle] = useState<DbArticle | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authorAvatar, setAuthorAvatar] = useState<string | null>(null);
 
   useEffect(() => {
     const fetch = async () => {
@@ -28,6 +29,14 @@ const ArticlePage = () => {
     };
     fetch();
   }, [slug]);
+
+  useEffect(() => {
+    if (article?.author_id) {
+      supabase.from("profiles").select("avatar_url").eq("user_id", article.author_id).maybeSingle().then(({ data }) => {
+        if (data?.avatar_url) setAuthorAvatar(data.avatar_url);
+      });
+    }
+  }, [article]);
 
   if (loading) {
     return (
@@ -51,15 +60,6 @@ const ArticlePage = () => {
   }
 
   const authorSlug = article.author_name.toLowerCase().replace(/\s+/g, "-");
-  const [authorAvatar, setAuthorAvatar] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (article?.author_id) {
-      supabase.from("profiles").select("avatar_url").eq("user_id", article.author_id).maybeSingle().then(({ data }) => {
-        if (data?.avatar_url) setAuthorAvatar(data.avatar_url);
-      });
-    }
-  }, [article]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
