@@ -7,6 +7,7 @@ import RichTextEditor from "@/components/RichTextEditor";
 import AITools from "@/components/AITools";
 import Header from "@/components/Header";
 import PageFooter from "@/components/PageFooter";
+import CoverImageUpload from "@/components/CoverImageUpload";
 import { ArrowLeft, Save, Send } from "lucide-react";
 
 const EditArticlePage = () => {
@@ -16,6 +17,7 @@ const EditArticlePage = () => {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [articleId, setArticleId] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [article, setArticle] = useState({
     title: "",
     content: "",
@@ -40,6 +42,7 @@ const EditArticlePage = () => {
       return;
     }
     setArticleId(data.id);
+    setImageUrl(data.image_url || null);
     setArticle({
       title: data.title,
       content: data.content,
@@ -63,6 +66,7 @@ const EditArticlePage = () => {
     const updates: any = {
       title: article.title, content: article.content,
       excerpt: article.excerpt || null, read_time: article.read_time,
+      image_url: imageUrl,
     };
     if (pub !== undefined) updates.published = pub;
     const { error } = await supabase.from("articles").update(updates).eq("id", articleId);
@@ -110,6 +114,7 @@ const EditArticlePage = () => {
         </div>
 
         <div className="max-w-3xl mx-auto">
+          <CoverImageUpload imageUrl={imageUrl} userId={user!.id} onImageChange={setImageUrl} />
           <input type="text" value={article.title} onChange={(e) => setArticle({ ...article, title: e.target.value })} placeholder="Article title..." className="w-full bg-transparent text-foreground font-heading text-2xl sm:text-4xl font-bold outline-none mb-4 placeholder:text-muted-foreground/30" />
           <textarea value={article.excerpt} onChange={(e) => setArticle({ ...article, excerpt: e.target.value })} rows={2} placeholder="Short summary..." className="w-full bg-transparent text-muted-foreground text-sm outline-none resize-none mb-6 placeholder:text-muted-foreground/30 border-b border-border pb-4" />
           <RichTextEditor content={article.content} onChange={(html) => setArticle({ ...article, content: html })} onAutoSave={() => save()} wordCount={wordCount} />
