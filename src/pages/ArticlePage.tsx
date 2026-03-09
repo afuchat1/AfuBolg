@@ -5,19 +5,28 @@ import Header from "@/components/Header";
 import PageFooter from "@/components/PageFooter";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import SEOHead from "@/components/SEOHead";
-import ArticleCard from "@/components/ArticleCard";
 import { Share2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import articlePlaceholder from "@/assets/article-placeholder.jpg";
 import type { Tables } from "@/integrations/supabase/types";
 
 type DbArticle = Tables<"articles">;
 
+/**
+ * Processes article HTML to add IDs to blockquotes for anchor linking.
+ * Writers can link to quotes using #quote-1, #quote-2, etc.
+ */
+const processContentWithAnchors = (html: string): string => {
+  let quoteIndex = 0;
+  return html.replace(/<blockquote/g, () => {
+    quoteIndex++;
+    return `<blockquote id="quote-${quoteIndex}"`;
+  });
+};
+
 const ArticlePage = () => {
   const { slug } = useParams();
   const [article, setArticle] = useState<DbArticle | null>(null);
-  const [related, setRelated] = useState<DbArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [authorAvatar, setAuthorAvatar] = useState<string | null>(null);
 
@@ -30,18 +39,6 @@ const ArticlePage = () => {
         .maybeSingle();
       setArticle(data);
       setLoading(false);
-
-      if (data) {
-        const { data: rel } = await supabase
-          .from("articles")
-          .select("*")
-          .eq("published", true)
-          .eq("category", data.category)
-          .neq("id", data.id)
-          .order("created_at", { ascending: false })
-          .limit(3);
-        setRelated(rel || []);
-      }
     };
     fetch();
   }, [slug]);
@@ -54,13 +51,23 @@ const ArticlePage = () => {
     }
   }, [article]);
 
+  // Scroll to hash anchor after content loads
+  useEffect(() => {
+    if (article && window.location.hash) {
+      setTimeout(() => {
+        const el = document.querySelector(window.location.hash);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  }, [article]);
+
   const handleShare = async () => {
     const url = window.location.href;
     if (navigator.share) {
       try { await navigator.share({ title: article?.title, url }); } catch {}
     } else {
       await navigator.clipboard.writeText(url);
-      toast.success("Link copied to clipboard!");
+      toast.success("Link copied!");
     }
   };
 
@@ -77,15 +84,15 @@ const ArticlePage = () => {
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
         <div className="flex-1 px-6 sm:px-10 lg:px-16 py-20">
-          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Not Found" }]} />
           <p className="text-muted-foreground">Article not found.</p>
         </div>
-        <PageFooter pageName="Article" relatedLinks={[{ label: "Home", href: "/" }]} />
+        <PageFooter pageName="Article" />
       </div>
     );
   }
 
   const authorSlug = article.author_name.toLowerCase().replace(/\s+/g, "-");
+  const processedContent = processContentWithAnchors(article.content);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -100,69 +107,40 @@ const ArticlePage = () => {
       />
       <Header />
 
-      <div className="relative w-full aspect-[21/9] max-h-[520px] overflow-hidden bg-muted">
-        <img src={article.image_url || articlePlaceholder} alt={article.title} className="w-full h-full object-cover" />
-      </div>
+      {article.image_url && (
+        <div className="w-full aspect-[21/9] max-h-[480px] overflow-hidden bg-muted">
+          <img src={article.image_url} alt={article.title} className="w-full h-full object-cover" />
+        </div>
+      )}
 
-      <article className="flex-1 px-6 sm:px-10 lg:px-16 py-12">
+      <article className="flex-1 px-6 sm:px-10 lg:px-16 py-10">
         <div className="max-w-3xl mx-auto">
-          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: article.category, href: `/category/${article.category}` }, { label: article.title }]} />
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary mt-6">{article.category}</span>
-          <h1 className="mt-3 font-heading text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold leading-[1.15] text-foreground">{article.title}</h1>
-          <div className="mt-5 flex items-center gap-3 text-sm text-muted-foreground">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-primary">{article.category}</span>
+          <h1 className="mt-2 font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold leading-[1.15] text-foreground">{article.title}</h1>
+          <div className="mt-4 flex items-center gap-3 text-xs text-muted-foreground">
             <Link to={`/writer/${authorSlug}`} className="flex items-center gap-2 no-underline">
               {authorAvatar ? (
-                <img src={authorAvatar} alt={article.author_name} className="w-8 h-8 rounded-full object-cover" />
+                <img src={authorAvatar} alt={article.author_name} className="w-7 h-7 rounded-full object-cover" />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-                  <span className="text-xs font-bold text-muted-foreground">{article.author_name.charAt(0).toUpperCase()}</span>
+                <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-muted-foreground">{article.author_name.charAt(0).toUpperCase()}</span>
                 </div>
               )}
               <span className="font-semibold text-foreground hover:text-primary transition-colors">{article.author_name}</span>
             </Link>
-            <span className="w-1 h-1 rounded-full bg-border" />
+            <span>·</span>
             <span>{article.read_time} read</span>
-            <span className="w-1 h-1 rounded-full bg-border" />
+            <span>·</span>
             <time>{new Date(article.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</time>
+            <button onClick={handleShare} className="ml-auto text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+              <Share2 size={13} /> Share
+            </button>
           </div>
-          <div className="mt-10 h-px bg-border" />
-          <div className="mt-10 prose max-w-none text-foreground/85 leading-[1.85] text-[16px]" dangerouslySetInnerHTML={{ __html: article.content }} />
-
-          {/* Share bar */}
-          <div className="mt-12 flex items-center gap-3 border-t border-border pt-6">
-            <Button variant="outline" size="sm" onClick={handleShare} className="text-muted-foreground hover:text-foreground">
-              <Share2 className="mr-1.5 h-4 w-4" />
-              Share this article
-            </Button>
-          </div>
+          <div className="mt-8 prose max-w-none text-foreground/85 leading-[1.85] text-[15px]" dangerouslySetInnerHTML={{ __html: processedContent }} />
         </div>
       </article>
 
-      {/* Related articles */}
-      {related.length > 0 && (
-        <section className="px-6 sm:px-10 lg:px-16 py-16 border-t border-border">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="font-heading text-2xl font-bold text-foreground mb-8">More in {article.category}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {related.map((a) => (
-                <ArticleCard
-                  key={a.id}
-                  slug={a.slug}
-                  title={a.title}
-                  excerpt={a.excerpt || ""}
-                  category={a.category}
-                  author={a.author_name}
-                  date={a.created_at}
-                  readTime={a.read_time || "3 min"}
-                  imageUrl={a.image_url}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      <PageFooter pageName="Article" relatedLinks={[{ label: "Home", href: "/" }, { label: "Archive", href: "/archive" }, { label: "Search", href: "/search" }]} />
+      <PageFooter pageName="Article" />
     </div>
   );
 };
