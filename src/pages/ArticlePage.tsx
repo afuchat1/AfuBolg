@@ -4,8 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import PageFooter from "@/components/PageFooter";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import ArticleEngagement from "@/components/ArticleEngagement";
 import SEOHead from "@/components/SEOHead";
+import ArticleCard from "@/components/ArticleCard";
+import { Share2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import articlePlaceholder from "@/assets/article-placeholder.jpg";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -14,6 +17,7 @@ type DbArticle = Tables<"articles">;
 const ArticlePage = () => {
   const { slug } = useParams();
   const [article, setArticle] = useState<DbArticle | null>(null);
+  const [related, setRelated] = useState<DbArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [authorAvatar, setAuthorAvatar] = useState<string | null>(null);
 
@@ -26,6 +30,18 @@ const ArticlePage = () => {
         .maybeSingle();
       setArticle(data);
       setLoading(false);
+
+      if (data) {
+        const { data: rel } = await supabase
+          .from("articles")
+          .select("*")
+          .eq("published", true)
+          .eq("category", data.category)
+          .neq("id", data.id)
+          .order("created_at", { ascending: false })
+          .limit(3);
+        setRelated(rel || []);
+      }
     };
     fetch();
   }, [slug]);
@@ -38,9 +54,19 @@ const ArticlePage = () => {
     }
   }, [article]);
 
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try { await navigator.share({ title: article?.title, url }); } catch {}
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard!");
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -48,7 +74,7 @@ const ArticlePage = () => {
 
   if (!article) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-background">
         <Header />
         <div className="flex-1 px-6 sm:px-10 lg:px-16 py-20">
           <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Not Found" }]} />
@@ -101,12 +127,40 @@ const ArticlePage = () => {
           </div>
           <div className="mt-10 h-px bg-border" />
           <div className="mt-10 prose max-w-none text-foreground/85 leading-[1.85] text-[16px]" dangerouslySetInnerHTML={{ __html: article.content }} />
+
+          {/* Share bar */}
+          <div className="mt-12 flex items-center gap-3 border-t border-border pt-6">
+            <Button variant="outline" size="sm" onClick={handleShare} className="text-muted-foreground hover:text-foreground">
+              <Share2 className="mr-1.5 h-4 w-4" />
+              Share this article
+            </Button>
+          </div>
         </div>
       </article>
 
-      <section className="px-6 sm:px-10 lg:px-16">
-        <ArticleEngagement articleId={article.id} articleTitle={article.title} />
-      </section>
+      {/* Related articles */}
+      {related.length > 0 && (
+        <section className="px-6 sm:px-10 lg:px-16 py-16 border-t border-border">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="font-heading text-2xl font-bold text-foreground mb-8">More in {article.category}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {related.map((a) => (
+                <ArticleCard
+                  key={a.id}
+                  slug={a.slug}
+                  title={a.title}
+                  excerpt={a.excerpt || ""}
+                  category={a.category}
+                  author={a.author_name}
+                  date={a.created_at}
+                  readTime={a.read_time || "3 min"}
+                  imageUrl={a.image_url}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <PageFooter pageName="Article" relatedLinks={[{ label: "Home", href: "/" }, { label: "Archive", href: "/archive" }, { label: "Search", href: "/search" }]} />
     </div>

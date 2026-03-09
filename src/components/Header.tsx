@@ -19,14 +19,14 @@ const Header = () => {
 
   return (
     <>
-      {/* Top bar */}
-      <header className="sticky top-0 z-50 bg-background border-b border-border">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="flex items-center justify-between px-6 sm:px-10 lg:px-16 h-16">
           <Link
             to="/"
-            className="font-heading text-xl font-extrabold tracking-tight text-foreground"
+            className="font-heading text-xl font-extrabold tracking-tight text-foreground flex items-center gap-2"
           >
-            Afu<span className="text-primary">Blog</span>
+            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground text-sm font-black">A</span>
+            <span>Afu<span className="text-primary">Blog</span></span>
           </Link>
 
           {/* Desktop nav */}
@@ -75,14 +75,13 @@ const Header = () => {
             ) : (
               <Link
                 to="/auth"
-                className="bg-foreground text-background px-5 py-2 text-sm font-semibold rounded-full hover:opacity-90 transition-opacity"
+                className="bg-primary text-primary-foreground px-5 py-2 text-sm font-semibold rounded-full hover:opacity-90 transition-opacity"
               >
                 Sign In
               </Link>
             )}
           </div>
 
-          {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="lg:hidden text-foreground p-2"
@@ -92,7 +91,6 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Category strip — desktop only, shown on home */}
         {location.pathname === "/" && (
           <div className="hidden lg:block border-t border-border">
             <div className="flex items-center gap-1 px-6 sm:px-10 lg:px-16 py-2 overflow-x-auto">
@@ -109,7 +107,6 @@ const Header = () => {
           </div>
         )}
 
-        {/* Mobile nav */}
         {mobileOpen && (
           <nav className="lg:hidden border-t border-border bg-background px-6 py-5 flex flex-col gap-4 animate-fade-in">
             {navLinks.map((p) => (
@@ -130,6 +127,9 @@ const Header = () => {
               Search
             </Link>
             <div className="h-px bg-border" />
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+            </div>
             {user ? (
               <>
                 <Link
@@ -151,7 +151,7 @@ const Header = () => {
               <Link
                 to="/auth"
                 onClick={() => setMobileOpen(false)}
-                className="bg-foreground text-background px-4 py-2.5 text-sm font-semibold rounded-full w-fit"
+                className="bg-primary text-primary-foreground px-4 py-2.5 text-sm font-semibold rounded-full w-fit"
               >
                 Sign In
               </Link>
