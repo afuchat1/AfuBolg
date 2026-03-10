@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import PageFooter from "@/components/PageFooter";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import SEOHead from "@/components/SEOHead";
 
 const AboutPage = () => {
   return (

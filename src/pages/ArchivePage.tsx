@@ -32,6 +32,7 @@ const ArchivePage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      <SEOHead title="All Stories" description="Browse the complete archive of AfuBlog articles on AI, chatbots, machine learning, and tech innovation from AfuChat." url="https://stark-news-flow.lovable.app/archive" keywords="AfuChat articles archive, AI blog posts, tech stories, chatbot news archive" />
       <main className="flex-1 py-10 px-6 sm:px-12 lg:px-20">
         <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "All Stories" }]} />
         <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight mt-4">All Stories</h1>
