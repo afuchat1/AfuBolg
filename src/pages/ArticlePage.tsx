@@ -3,19 +3,15 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import PageFooter from "@/components/PageFooter";
-import Breadcrumbs from "@/components/Breadcrumbs";
 import SEOHead from "@/components/SEOHead";
 import { Share2 } from "lucide-react";
 import { toast } from "sonner";
-import articlePlaceholder from "@/assets/article-placeholder.jpg";
 import type { Tables } from "@/integrations/supabase/types";
 
 type DbArticle = Tables<"articles">;
 
-/**
- * Processes article HTML to add IDs to blockquotes for anchor linking.
- * Writers can link to quotes using #quote-1, #quote-2, etc.
- */
+const BASE_URL = "https://stark-news-flow.lovable.app";
+
 const processContentWithAnchors = (html: string): string => {
   let quoteIndex = 0;
   return html.replace(/<blockquote/g, () => {
@@ -51,7 +47,6 @@ const ArticlePage = () => {
     }
   }, [article]);
 
-  // Scroll to hash anchor after content loads
   useEffect(() => {
     if (article && window.location.hash) {
       setTimeout(() => {
@@ -93,23 +88,64 @@ const ArticlePage = () => {
 
   const authorSlug = article.author_name.toLowerCase().replace(/\s+/g, "-");
   const processedContent = processContentWithAnchors(article.content);
+  const articleUrl = `${BASE_URL}/article/${article.slug}`;
+  const plainText = article.content.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const wordCount = plainText.split(/\s+/).filter(Boolean).length;
+
+  // Extract keywords from title and category
+  const articleKeywords = `${article.category}, ${article.title.split(" ").slice(0, 5).join(", ")}, AfuChat blog, ${article.author_name}`;
+
+  // JSON-LD Article structured data for Google rich results with images
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": article.title,
+    "description": article.excerpt || plainText.slice(0, 160),
+    "image": article.image_url ? [article.image_url] : [],
+    "author": {
+      "@type": "Person",
+      "name": article.author_name,
+      "url": `${BASE_URL}/writer/${authorSlug}`,
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AfuBlog",
+      "url": BASE_URL,
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${BASE_URL}/favicon.png`,
+      },
+    },
+    "datePublished": article.created_at,
+    "dateModified": article.updated_at,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": articleUrl,
+    },
+    "wordCount": wordCount,
+    "articleSection": article.category,
+    "inLanguage": "en-US",
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SEOHead
         title={article.title}
-        description={article.excerpt || article.title}
-        url={`https://stark-news-flow.lovable.app/article/${article.slug}`}
+        description={article.excerpt || plainText.slice(0, 155)}
+        url={articleUrl}
         image={article.image_url || undefined}
         type="article"
         author={article.author_name}
         publishedTime={article.created_at}
+        modifiedTime={article.updated_at}
+        keywords={articleKeywords}
+        jsonLd={jsonLd}
       />
       <Header />
 
       {article.image_url && (
         <div className="w-full aspect-[21/9] max-h-[480px] overflow-hidden bg-muted">
-          <img src={article.image_url} alt={article.title} className="w-full h-full object-cover" />
+          <img src={article.image_url} alt={article.title} className="w-full h-full object-cover" loading="eager" />
         </div>
       )}
 
@@ -131,7 +167,7 @@ const ArticlePage = () => {
             <span>·</span>
             <span>{article.read_time} read</span>
             <span>·</span>
-            <time>{new Date(article.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</time>
+            <time dateTime={article.created_at}>{new Date(article.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</time>
             <button onClick={handleShare} className="ml-auto text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
               <Share2 size={13} /> Share
             </button>
