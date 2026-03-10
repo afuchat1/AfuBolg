@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import ArticleCard from "@/components/ArticleCard";
@@ -8,6 +7,8 @@ import SEOHead from "@/components/SEOHead";
 import type { Tables } from "@/integrations/supabase/types";
 
 type DbArticle = Tables<"articles">;
+
+const BASE_URL = "https://stark-news-flow.lovable.app";
 
 const Index = () => {
   const [articles, setArticles] = useState<DbArticle[]>([]);
@@ -26,6 +27,26 @@ const Index = () => {
     fetchArticles();
   }, []);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "AfuBlog",
+    "alternateName": "AfuChat Blog",
+    "url": BASE_URL,
+    "description": "The official blog for AfuChat — AI chatbot platform. Read the latest on artificial intelligence, machine learning, chatbot development, and tech innovation.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "AfuChat",
+      "url": "https://afuchat.com",
+      "logo": { "@type": "ImageObject", "url": `${BASE_URL}/favicon.png` },
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": { "@type": "EntryPoint", "urlTemplate": `${BASE_URL}/search?q={search_term_string}` },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
@@ -39,7 +60,13 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <SEOHead title="Home" description="AfuBlog — The official news and updates platform for AfuChat.com. Read the latest tech stories, AI insights, and more." url="https://stark-news-flow.lovable.app" />
+      <SEOHead
+        title="Home"
+        description="AfuBlog — The official blog for AfuChat.com. Read the latest articles on AI, chatbots, machine learning, natural language processing, and tech innovation from AfuChat experts."
+        url={BASE_URL}
+        keywords="AfuChat blog, AI news, chatbot updates, artificial intelligence articles, machine learning insights, NLP, tech blog, AI platform news"
+        jsonLd={jsonLd}
+      />
       <Header />
 
       <main className="flex-1 px-6 sm:px-10 lg:px-16 py-10">

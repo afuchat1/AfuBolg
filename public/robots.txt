@@ -1,11 +1,21 @@
 User-agent: *
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /settings
+Disallow: /write
+Disallow: /edit/
+Disallow: /auth
 
 User-agent: Googlebot
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
 
 User-agent: Bingbot
 Allow: /
+Disallow: /dashboard
+Disallow: /admin
 
 User-agent: Twitterbot
 Allow: /
