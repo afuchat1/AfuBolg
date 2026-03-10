@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import PageFooter from "@/components/PageFooter";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ArticleCard from "@/components/ArticleCard";
+import SEOHead from "@/components/SEOHead";
 import type { Tables } from "@/integrations/supabase/types";
 
 type DbArticle = Tables<"articles">;

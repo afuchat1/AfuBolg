@@ -6,6 +6,7 @@ const AboutPage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      <SEOHead title="About" description="Learn about AfuBlog — the official blog for AfuChat.com, your AI-powered conversational assistant. Discover our mission and team." url="https://stark-news-flow.lovable.app/about" keywords="about AfuChat, AfuBlog team, AI chatbot company, AfuChat mission" />
       <main className="flex-1 py-10">
         <div className="container">
           <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "About" }]} />
