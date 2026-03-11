@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import ArticleCard from "@/components/ArticleCard";
 import PageFooter from "@/components/PageFooter";
 import SEOHead from "@/components/SEOHead";
+import AfuChatAd from "@/components/AfuChatAd";
 import type { Tables } from "@/integrations/supabase/types";
 
 type DbArticle = Tables<"articles">;
