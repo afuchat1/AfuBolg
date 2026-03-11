@@ -71,6 +71,7 @@ const Index = () => {
       <Header />
 
       <main className="flex-1 px-6 sm:px-10 lg:px-16 py-10">
+        <AfuChatAd className="mb-8" />
         {articles.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
             {articles.map((a) => (
@@ -92,6 +93,7 @@ const Index = () => {
             <p className="text-muted-foreground">No articles published yet.</p>
           </div>
         )}
+        <AfuChatAd className="mt-8" />
       </main>
 
       <PageFooter pageName="Home" />
