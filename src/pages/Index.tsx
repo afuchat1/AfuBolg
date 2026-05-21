@@ -297,7 +297,8 @@ const Index = () => {
               );
             })}
 
-            <AfuChatAd className="mt-8" />
+            <AfuChatAd variant="in-feed" className="mt-10" />
+            <AfuChatAd variant="sticky-bottom" />
           </>
         )}
       </main>
