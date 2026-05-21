@@ -197,7 +197,34 @@ const ArticlePage = () => {
           <div className="prose max-w-none text-foreground/85 leading-[1.85] text-[15px]" dangerouslySetInnerHTML={{ __html: processedContent }} />
 
           <AfuChatAd className="mt-8" />
+
+          {/* Breadcrumb trail */}
+          <nav aria-label="Breadcrumb" className="mt-10 text-[11px] uppercase tracking-widest text-muted-foreground">
+            <Link to="/" className="hover:text-primary">Home</Link>
+            <span className="mx-2">/</span>
+            <Link to={`/category/${article.category.toLowerCase()}`} className="hover:text-primary">{article.category}</Link>
+          </nav>
         </div>
+
+        {/* Related stories */}
+        {related.length > 0 && (
+          <aside className="max-w-6xl mx-auto mt-14 pt-8 border-t border-muted">
+            <h2 className="font-heading text-base font-extrabold uppercase tracking-widest text-foreground mb-5">
+              More in {article.category}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
+              {related.map((r) => (
+                <Link key={r.id} to={`/article/${r.slug}`} className="group block">
+                  <div className="aspect-[3/2] overflow-hidden bg-muted mb-2">
+                    <img src={r.image_url || ""} alt={r.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" loading="lazy" />
+                  </div>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{r.category}</span>
+                  <h3 className="font-heading text-sm font-bold text-foreground mt-1 leading-snug line-clamp-3 group-hover:text-primary transition-colors">{r.title}</h3>
+                </Link>
+              ))}
+            </div>
+          </aside>
+        )}
       </article>
 
       <PageFooter pageName="Article" />
