@@ -192,11 +192,12 @@ const ArticlePage = () => {
             </button>
           </div>
 
-          <AfuChatAd className="mt-6 mb-6" />
+          <AfuChatAd variant="leaderboard" className="mt-6 mb-8" label="Advertisement" />
 
           <div className="prose max-w-none text-foreground/85 leading-[1.85] text-[15px]" dangerouslySetInnerHTML={{ __html: processedContent }} />
 
-          <AfuChatAd className="mt-8" />
+          <AfuChatAd variant="in-feed" className="mt-10" label="You may also like" />
+          <AfuChatAd variant="sticky-bottom" />
 
           {/* Breadcrumb trail */}
           <nav aria-label="Breadcrumb" className="mt-10 text-[11px] uppercase tracking-widest text-muted-foreground">
