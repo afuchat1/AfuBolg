@@ -26,6 +26,7 @@ const ArticlePage = () => {
   const [article, setArticle] = useState<DbArticle | null>(null);
   const [loading, setLoading] = useState(true);
   const [authorAvatar, setAuthorAvatar] = useState<string | null>(null);
+  const [related, setRelated] = useState<DbArticle[]>([]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -36,6 +37,17 @@ const ArticlePage = () => {
         .maybeSingle();
       setArticle(data);
       setLoading(false);
+      if (data) {
+        const { data: rel } = await supabase
+          .from("articles")
+          .select("*")
+          .eq("published", true)
+          .eq("category", data.category)
+          .neq("id", data.id)
+          .order("created_at", { ascending: false })
+          .limit(4);
+        setRelated(rel || []);
+      }
     };
     fetch();
   }, [slug]);
