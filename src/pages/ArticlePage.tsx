@@ -26,6 +26,7 @@ const ArticlePage = () => {
   const [article, setArticle] = useState<DbArticle | null>(null);
   const [loading, setLoading] = useState(true);
   const [authorAvatar, setAuthorAvatar] = useState<string | null>(null);
+  const [related, setRelated] = useState<DbArticle[]>([]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -36,6 +37,17 @@ const ArticlePage = () => {
         .maybeSingle();
       setArticle(data);
       setLoading(false);
+      if (data) {
+        const { data: rel } = await supabase
+          .from("articles")
+          .select("*")
+          .eq("published", true)
+          .eq("category", data.category)
+          .neq("id", data.id)
+          .order("created_at", { ascending: false })
+          .limit(4);
+        setRelated(rel || []);
+      }
     };
     fetch();
   }, [slug]);
@@ -96,36 +108,42 @@ const ArticlePage = () => {
   // Extract keywords from title and category
   const articleKeywords = `${article.category}, ${article.title.split(" ").slice(0, 5).join(", ")}, AfuChat blog, ${article.author_name}`;
 
-  // JSON-LD Article structured data for Google rich results with images
+  // JSON-LD NewsArticle + BreadcrumbList for rich search results
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": article.title,
-    "description": article.excerpt || plainText.slice(0, 160),
-    "image": article.image_url ? [article.image_url] : [],
-    "author": {
-      "@type": "Person",
-      "name": article.author_name,
-      "url": `${BASE_URL}/writer/${authorSlug}`,
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "AfuBlog",
-      "url": BASE_URL,
-      "logo": {
-        "@type": "ImageObject",
-        "url": `${BASE_URL}/favicon.png`,
+    "@graph": [
+      {
+        "@type": "NewsArticle",
+        "headline": article.title,
+        "description": article.excerpt || plainText.slice(0, 160),
+        "image": article.image_url ? [article.image_url] : [],
+        "author": {
+          "@type": "Person",
+          "name": article.author_name,
+          "url": `${BASE_URL}/writer/${authorSlug}`,
+        },
+        "publisher": {
+          "@type": "NewsMediaOrganization",
+          "name": "AfuBlog",
+          "url": BASE_URL,
+          "logo": { "@type": "ImageObject", "url": `${BASE_URL}/favicon.png` },
+        },
+        "datePublished": article.created_at,
+        "dateModified": article.updated_at,
+        "mainEntityOfPage": { "@type": "WebPage", "@id": articleUrl },
+        "wordCount": wordCount,
+        "articleSection": article.category,
+        "inLanguage": "en-US",
       },
-    },
-    "datePublished": article.created_at,
-    "dateModified": article.updated_at,
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": articleUrl,
-    },
-    "wordCount": wordCount,
-    "articleSection": article.category,
-    "inLanguage": "en-US",
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+          { "@type": "ListItem", position: 2, name: article.category, item: `${BASE_URL}/category/${article.category.toLowerCase()}` },
+          { "@type": "ListItem", position: 3, name: article.title, item: articleUrl },
+        ],
+      },
+    ],
   };
 
   return (
@@ -179,7 +197,34 @@ const ArticlePage = () => {
           <div className="prose max-w-none text-foreground/85 leading-[1.85] text-[15px]" dangerouslySetInnerHTML={{ __html: processedContent }} />
 
           <AfuChatAd className="mt-8" />
+
+          {/* Breadcrumb trail */}
+          <nav aria-label="Breadcrumb" className="mt-10 text-[11px] uppercase tracking-widest text-muted-foreground">
+            <Link to="/" className="hover:text-primary">Home</Link>
+            <span className="mx-2">/</span>
+            <Link to={`/category/${article.category.toLowerCase()}`} className="hover:text-primary">{article.category}</Link>
+          </nav>
         </div>
+
+        {/* Related stories */}
+        {related.length > 0 && (
+          <aside className="max-w-6xl mx-auto mt-14 pt-8 border-t border-muted">
+            <h2 className="font-heading text-base font-extrabold uppercase tracking-widest text-foreground mb-5">
+              More in {article.category}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
+              {related.map((r) => (
+                <Link key={r.id} to={`/article/${r.slug}`} className="group block">
+                  <div className="aspect-[3/2] overflow-hidden bg-muted mb-2">
+                    <img src={r.image_url || ""} alt={r.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" loading="lazy" />
+                  </div>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">{r.category}</span>
+                  <h3 className="font-heading text-sm font-bold text-foreground mt-1 leading-snug line-clamp-3 group-hover:text-primary transition-colors">{r.title}</h3>
+                </Link>
+              ))}
+            </div>
+          </aside>
+        )}
       </article>
 
       <PageFooter pageName="Article" />
