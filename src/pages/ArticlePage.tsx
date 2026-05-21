@@ -108,36 +108,42 @@ const ArticlePage = () => {
   // Extract keywords from title and category
   const articleKeywords = `${article.category}, ${article.title.split(" ").slice(0, 5).join(", ")}, AfuChat blog, ${article.author_name}`;
 
-  // JSON-LD Article structured data for Google rich results with images
+  // JSON-LD NewsArticle + BreadcrumbList for rich search results
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": article.title,
-    "description": article.excerpt || plainText.slice(0, 160),
-    "image": article.image_url ? [article.image_url] : [],
-    "author": {
-      "@type": "Person",
-      "name": article.author_name,
-      "url": `${BASE_URL}/writer/${authorSlug}`,
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "AfuBlog",
-      "url": BASE_URL,
-      "logo": {
-        "@type": "ImageObject",
-        "url": `${BASE_URL}/favicon.png`,
+    "@graph": [
+      {
+        "@type": "NewsArticle",
+        "headline": article.title,
+        "description": article.excerpt || plainText.slice(0, 160),
+        "image": article.image_url ? [article.image_url] : [],
+        "author": {
+          "@type": "Person",
+          "name": article.author_name,
+          "url": `${BASE_URL}/writer/${authorSlug}`,
+        },
+        "publisher": {
+          "@type": "NewsMediaOrganization",
+          "name": "AfuBlog",
+          "url": BASE_URL,
+          "logo": { "@type": "ImageObject", "url": `${BASE_URL}/favicon.png` },
+        },
+        "datePublished": article.created_at,
+        "dateModified": article.updated_at,
+        "mainEntityOfPage": { "@type": "WebPage", "@id": articleUrl },
+        "wordCount": wordCount,
+        "articleSection": article.category,
+        "inLanguage": "en-US",
       },
-    },
-    "datePublished": article.created_at,
-    "dateModified": article.updated_at,
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": articleUrl,
-    },
-    "wordCount": wordCount,
-    "articleSection": article.category,
-    "inLanguage": "en-US",
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+          { "@type": "ListItem", position: 2, name: article.category, item: `${BASE_URL}/category/${article.category.toLowerCase()}` },
+          { "@type": "ListItem", position: 3, name: article.title, item: articleUrl },
+        ],
+      },
+    ],
   };
 
   return (
