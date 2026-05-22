@@ -21,6 +21,36 @@ const SITE = "09b0a2f6-3def-44b4-84e7-37cecfd42477";
 const adUrl = (format: AdFormat) =>
   `https://zuekwzcnknkczelivurf.supabase.co/functions/v1/serve-ad?publisher=${PUBLISHER}&site=${SITE}&format=${format}`;
 
+const extractYouTubeId = (url: string): string | null => {
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes("youtu.be")) return u.pathname.slice(1).split("/")[0] || null;
+    if (u.hostname.includes("youtube.com")) {
+      if (u.pathname.startsWith("/embed/")) return u.pathname.split("/")[2] || null;
+      if (u.pathname.startsWith("/shorts/")) return u.pathname.split("/")[2] || null;
+      return u.searchParams.get("v");
+    }
+  } catch {
+    /* noop */
+  }
+  return null;
+};
+
+// The ad server occasionally puts a YouTube URL inside <img src>. Detect that
+// and swap it for a real YouTube embed so the creative actually plays.
+const transformAdHtml = (raw: string): string => {
+  const transformed = raw.replace(
+    /<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi,
+    (match, src: string) => {
+      const id = extractYouTubeId(src);
+      if (!id) return match;
+      const embed = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0&modestbranding=1&playsinline=1&rel=0&showinfo=0&iv_load_policy=3`;
+      return `<iframe src="${embed}" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;pointer-events:none;object-fit:cover"></iframe>`;
+    }
+  );
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base target="_blank"><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:transparent;font-family:system-ui,sans-serif}*{box-sizing:border-box}img,video{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:cover;display:block;border:0}a{display:block;width:100%;height:100%}</style></head><body>${transformed}</body></html>`;
+};
+
 const useAdHtml = (format: AdFormat) => {
   const [html, setHtml] = useState<string | null>(null);
   useEffect(() => {
@@ -29,9 +59,7 @@ const useAdHtml = (format: AdFormat) => {
       .then((r) => r.text())
       .then((t) => {
         if (cancelled) return;
-        // Wrap to ensure media fills frame, autoplay-friendly, no margin
-        const wrapped = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:transparent;font-family:system-ui,sans-serif}*{box-sizing:border-box}img,video,iframe{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:cover;display:block;border:0}a{display:block;width:100%;height:100%}</style></head><body>${t}</body></html>`;
-        setHtml(wrapped);
+        setHtml(transformAdHtml(t));
       })
       .catch(() => {});
     return () => {
