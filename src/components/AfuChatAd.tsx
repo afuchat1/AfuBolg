@@ -39,7 +39,7 @@ const extractYouTubeId = (url: string): string | null => {
 // The ad server occasionally puts a YouTube URL inside <img src>. Detect that
 // and swap it for a real YouTube embed so the creative actually plays.
 const transformAdHtml = (raw: string): string => {
-  const transformed = raw.replace(
+  let transformed = raw.replace(
     /<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi,
     (match, src: string) => {
       const id = extractYouTubeId(src);
@@ -48,7 +48,11 @@ const transformAdHtml = (raw: string): string => {
       return `<iframe src="${embed}" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;pointer-events:none;object-fit:cover"></iframe>`;
     }
   );
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base target="_blank"><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:transparent;font-family:system-ui,sans-serif}*{box-sizing:border-box}img,video{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:cover;display:block;border:0}a{display:block;width:100%;height:100%}</style></head><body>${transformed}</body></html>`;
+
+  // Strip the text overlay (headline + body) baked into the creative — keep media only.
+  transformed = transformed.replace(/<div\b[^>]*class=["'][^"']*\boverlay\b[^"']*["'][^>]*>[\s\S]*?<\/div>/gi, "");
+
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base target="_blank"><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:transparent;font-family:system-ui,sans-serif}*{box-sizing:border-box}img,video{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:cover;display:block;border:0}a{display:block;width:100%;height:100%}.overlay{display:none!important}</style></head><body>${transformed}</body></html>`;
 };
 
 const useAdHtml = (format: AdFormat) => {
