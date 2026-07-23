@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import PageFooter from "@/components/PageFooter";
 import SEOHead from "@/components/SEOHead";
 import AfuChatAd from "@/components/AfuChatAd";
+import ArticleSummary from "@/components/ArticleSummary";
 import { Share2 } from "lucide-react";
 import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
@@ -193,6 +194,8 @@ const ArticlePage = () => {
           </div>
 
           <AfuChatAd variant="leaderboard" className="mt-6 mb-8" label="Advertisement" />
+
+          <ArticleSummary title={article.title} content={article.content} category={article.category} />
 
           <div className="prose max-w-none text-foreground/85 leading-[1.85] text-[15px]" dangerouslySetInnerHTML={{ __html: processedContent }} />
 
