@@ -193,7 +193,7 @@ const ArticlePage = () => {
             </button>
           </div>
 
-          <ArticleSummary title={article.title} content={article.content} category={article.category} />
+          <ArticleSummary articleId={article.id} title={article.title} content={article.content} category={article.category} />
 
           <AfuChatAd variant="leaderboard" className="mt-6 mb-8" label="Advertisement" />
 
