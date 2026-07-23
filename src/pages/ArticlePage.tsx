@@ -193,9 +193,9 @@ const ArticlePage = () => {
             </button>
           </div>
 
-          <AfuChatAd variant="leaderboard" className="mt-6 mb-8" label="Advertisement" />
-
           <ArticleSummary title={article.title} content={article.content} category={article.category} />
+
+          <AfuChatAd variant="leaderboard" className="mt-6 mb-8" label="Advertisement" />
 
           <div className="prose max-w-none text-foreground/85 leading-[1.85] text-[15px]" dangerouslySetInnerHTML={{ __html: processedContent }} />
 
