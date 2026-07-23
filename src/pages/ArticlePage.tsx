@@ -11,7 +11,7 @@ import type { Tables } from "@/integrations/supabase/types";
 
 type DbArticle = Tables<"articles">;
 
-const BASE_URL = "https://stark-news-flow.lovable.app";
+const BASE_URL = "https://blog.afuchat.com";
 
 const processContentWithAnchors = (html: string): string => {
   let quoteIndex = 0;
