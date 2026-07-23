@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      article_summaries: {
+        Row: {
+          article_id: string
+          content_hash: string
+          created_at: string
+          data: Json
+          updated_at: string
+        }
+        Insert: {
+          article_id: string
+          content_hash: string
+          created_at?: string
+          data: Json
+          updated_at?: string
+        }
+        Update: {
+          article_id?: string
+          content_hash?: string
+          created_at?: string
+          data?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_summaries_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: true
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       articles: {
         Row: {
           author_id: string | null
@@ -159,6 +191,24 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      summary_rate_limits: {
+        Row: {
+          count: number
+          ip: string
+          window_start: string
+        }
+        Insert: {
+          count?: number
+          ip: string
+          window_start: string
+        }
+        Update: {
+          count?: number
+          ip?: string
+          window_start?: string
         }
         Relationships: []
       }
