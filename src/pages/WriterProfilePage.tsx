@@ -62,7 +62,7 @@ const WriterProfilePage = () => {
       <SEOHead
         title={displayName}
         description={`Articles by ${displayName} on AfuBlog`}
-        url={`https://stark-news-flow.lovable.app/writer/${name}`}
+        url={`https://blog.afuchat.com/writer/${name}`}
         type="profile"
       />
       <Header />

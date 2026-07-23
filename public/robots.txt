@@ -53,4 +53,4 @@ Allow: /
 User-agent: cohere-ai
 Allow: /
 
-Sitemap: https://stark-news-flow.lovable.app/sitemap.xml
+Sitemap: https://blog.afuchat.com/sitemap.xml
