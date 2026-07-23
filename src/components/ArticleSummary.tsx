@@ -18,12 +18,13 @@ interface SummaryData {
 }
 
 interface Props {
+  articleId?: string;
   title: string;
   content: string;
   category?: string;
 }
 
-const ArticleSummary = ({ title, content, category }: Props) => {
+const ArticleSummary = ({ articleId, title, content, category }: Props) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<SummaryData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +40,7 @@ const ArticleSummary = ({ title, content, category }: Props) => {
     (async () => {
       try {
         const { data: res, error: err } = await supabase.functions.invoke("summarize-article", {
-          body: { title, content, category },
+          body: { articleId, title, content, category },
         });
         if (err) throw err;
         if (res?.error) throw new Error(res.error);
@@ -50,7 +51,7 @@ const ArticleSummary = ({ title, content, category }: Props) => {
         setLoading(false);
       }
     })();
-  }, [title, content, category]);
+  }, [articleId, title, content, category]);
 
   if (error) return null;
 
