@@ -297,7 +297,7 @@ const Index = () => {
               );
             })}
 
-            <AfuChatAd variant="in-feed" className="mt-10" />
+            <AfuChatAd variant="in-feed" className="mt-16" label="Advertisement" />
             <AfuChatAd variant="sticky-bottom" />
           </>
         )}
