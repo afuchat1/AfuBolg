@@ -55,10 +55,10 @@ const parseAd = (raw: string): ParsedAd | null => {
   let mediaHtml = "";
   const ytId = extractYouTubeId(srcAttr);
   if (ytId) {
-    // AfuChat publisher rule: no auto-playing audio/video. User-initiated only.
+    // AfuChat publisher rule: no auto-playing audio/video. Show static thumbnail;
+    // the whole card links to the advertiser.
     const thumb = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
-    const embed = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&controls=1&modestbranding=1&playsinline=1&rel=0`;
-    mediaHtml = `<div id="p" style="position:absolute;inset:0;cursor:pointer"><img src="${thumb}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div style="width:56px;height:40px;background:rgba(0,0,0,.75);border-radius:8px;display:flex;align-items:center;justify-content:center"><div style="width:0;height:0;border-left:14px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:3px"></div></div></div></div><script>document.getElementById('p').addEventListener('click',function(){this.outerHTML='<iframe src="${embed}" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>'});</script>`;
+    mediaHtml = `<img src="${thumb}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block">`;
   } else if (srcAttr) {
     mediaHtml = `<img src="${srcAttr}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block">`;
   }
