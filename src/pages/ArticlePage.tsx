@@ -199,7 +199,7 @@ const ArticlePage = () => {
 
           <div className="prose max-w-none text-foreground/85 leading-[1.85] text-[15px]" dangerouslySetInnerHTML={{ __html: processedContent }} />
 
-          <AfuChatAd variant="in-feed" className="mt-10" label="You may also like" />
+          <AfuChatAd variant="in-feed" className="mt-10" label="Advertisement" />
           <AfuChatAd variant="sticky-bottom" />
 
           {/* Breadcrumb trail */}
