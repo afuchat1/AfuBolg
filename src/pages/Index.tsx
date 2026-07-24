@@ -230,7 +230,7 @@ const Index = () => {
               </div>
             </section>
 
-            <AfuChatAd variant="leaderboard" className="my-8" />
+            <AfuChatAd variant="leaderboard" className="my-12" label="Advertisement" />
 
             {/* Latest grid */}
             {latest.length > 0 && (
@@ -297,7 +297,7 @@ const Index = () => {
               );
             })}
 
-            <AfuChatAd variant="in-feed" className="mt-10" />
+            <AfuChatAd variant="in-feed" className="mt-16" label="Advertisement" />
             <AfuChatAd variant="sticky-bottom" />
           </>
         )}

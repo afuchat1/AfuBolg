@@ -55,8 +55,10 @@ const parseAd = (raw: string): ParsedAd | null => {
   let mediaHtml = "";
   const ytId = extractYouTubeId(srcAttr);
   if (ytId) {
-    const embed = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&modestbranding=1&playsinline=1&rel=0&showinfo=0&iv_load_policy=3`;
-    mediaHtml = `<iframe src="${embed}" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none"></iframe>`;
+    // AfuChat publisher rule: no auto-playing audio/video. Show static thumbnail;
+    // the whole card links to the advertiser.
+    const thumb = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
+    mediaHtml = `<img src="${thumb}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block">`;
   } else if (srcAttr) {
     mediaHtml = `<img src="${srcAttr}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block">`;
   }
