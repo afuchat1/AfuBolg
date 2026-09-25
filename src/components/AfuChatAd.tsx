@@ -66,10 +66,18 @@ interface ParsedAd {
 const parseAd = (raw: string): ParsedAd | null => {
   if (!raw || raw.includes("No ads available")) return null;
   const doc = new DOMParser().parseFromString(raw, "text/html");
-  const anchor = doc.querySelector("a.banner-ad, a") as HTMLAnchorElement | null;
-  const img = doc.querySelector("img") as HTMLImageElement | null;
-  const headline = doc.querySelector(".overlay h3, h3")?.textContent?.trim() || "";
-  const description = doc.querySelector(".overlay p, p")?.textContent?.trim() || "";
+  // Ignore the network's header menu (docs / about links) — only read the ad body.
+  doc.querySelectorAll(".ac-header, .ac-menu, .ac-pubid").forEach((el) => el.remove());
+  const root: ParentNode = doc.querySelector(".ac-body") || doc;
+  const anchor =
+    (root.querySelector("a.banner-ad, a[href*='track-click']") as HTMLAnchorElement | null) ||
+    (Array.from(root.querySelectorAll("a")).find(
+      (a) => !/ads\.afuchat\.com/i.test(a.getAttribute("href") || "")
+    ) as HTMLAnchorElement | undefined) ||
+    null;
+  const img = (root.querySelector("img.creative") || root.querySelector("img")) as HTMLImageElement | null;
+  const headline = root.querySelector(".overlay h3, h3")?.textContent?.trim() || "";
+  const description = root.querySelector(".overlay p, p")?.textContent?.trim() || "";
   const clickUrl = anchor?.getAttribute("href") || "#";
   const srcAttr = img?.getAttribute("src") || "";
 
