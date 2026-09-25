@@ -162,7 +162,7 @@ const AdMedia = ({ format, html }: { format: AdFormat; html: string }) => {
   );
 };
 
-const AdMenu = ({ ad, onDone }: { ad: ParsedAd; onDone: (msg: string) => void }) => {
+const AdMenu = ({ ad, onDone, up = false }: { ad: ParsedAd; onDone: (msg: string) => void; up?: boolean }) => {
   const [open, setOpen] = useState(false);
   const send = (f: ParsedAd["feedback"][number]) => {
     fetch(f.url, { method: "POST", keepalive: true }).catch(() => {});
@@ -184,7 +184,7 @@ const AdMenu = ({ ad, onDone }: { ad: ParsedAd; onDone: (msg: string) => void })
         AfuChat <span className="text-[9px]">▾</span>
       </button>
       {open && (
-        <div role="menu" className="absolute right-0 top-6 z-30 w-60 bg-popover text-popover-foreground shadow-lg rounded-md p-1.5 text-sm">
+        <div role="menu" className={`absolute right-0 ${up ? "bottom-6" : "top-6"} z-30 w-60 bg-popover text-popover-foreground shadow-lg rounded-md p-1.5 text-sm`}>
           <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Ad settings</div>
           {stop.map((f) => (
             <button key={f.url} role="menuitem" onClick={() => send(f)} className="w-full text-left px-2.5 py-2 rounded hover:bg-muted">⊘ {f.label}</button>
@@ -374,7 +374,7 @@ const AfuChatAd = ({
               )}
             </div>
           </a>
-          <AdMenu ad={ad} onDone={done} />
+          <AdMenu ad={ad} onDone={done} up />
           <button
             onClick={() => setDismissed(true)}
             aria-label="Dismiss ad"
