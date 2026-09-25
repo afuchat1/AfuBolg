@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
       { onConflict: "ip,window_start" },
     );
 
-    // 3. GENERATE — Engagera first, Lovable AI fallback if Engagera is down
+    // 3. GENERATE — Engagera only (no fallback)
     const systemPrompt =
       "You are an expert news editor for AfuBlog (by AfuChat). Produce a rich, accurate TL;DR of the given article. Use live web context when available to verify or add recent facts. Respond ONLY with valid JSON — no markdown, no code fences. Shape: { \"tldr\": string, \"keyPoints\": string[], \"context\": string, \"whyItMatters\": string }. keyPoints: 3-5 short bullets. tldr: 2-3 sentence executive summary. context: 1-2 sentences of relevant real-world context. whyItMatters: 1-2 sentence takeaway.";
     const userPrompt = `Category: ${category ?? "General"}\nTitle: ${title}\n\nArticle:\n${plain}`;
@@ -88,43 +88,36 @@ Deno.serve(async (req) => {
     let model = "";
 
     const apiKey = Deno.env.get("ENGAGERA_API_KEY");
-    if (apiKey) {
-      try {
-        const client = new Engagera({ apiKey });
-        const reply = await client.chat.create({
-          model: "engagera-pro",
-          useAfuBot: true,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-        });
-        raw = (reply.content ?? "").trim();
-        sources = reply.sources ?? [];
-        model = reply.model;
-      } catch (err) {
-        console.warn("Engagera failed, falling back:", err);
-      }
-    }
-
-    if (!raw) {
-      const lovableKey = Deno.env.get("LOVABLE_API_KEY");
-      if (!lovableKey) throw new Error("Summary service unavailable");
-      const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${lovableKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-        }),
+    if (!apiKey) {
+      return new Response(JSON.stringify({ error: "Summary service unavailable" }), {
+        status: 503, headers: corsHeaders,
       });
-      if (!r.ok) throw new Error(`Summary service unavailable (${r.status})`);
-      const j = await r.json();
-      raw = (j.choices?.[0]?.message?.content ?? "").trim();
-      model = j.model ?? "fallback";
+    }
+    try {
+      const client = new Engagera({ apiKey });
+      const reply = await client.chat.create({
+        model: "engagera-pro",
+        useAfuBot: true,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+      });
+      raw = (reply.content ?? "").trim();
+      sources = reply.sources ?? [];
+      model = reply.model;
+    } catch (err) {
+      console.error("Engagera failed:", err);
+      return new Response(
+        JSON.stringify({ error: "Summary service unavailable. Please try again shortly." }),
+        { status: 503, headers: corsHeaders },
+      );
+    }
+    if (!raw) {
+      return new Response(
+        JSON.stringify({ error: "Summary service unavailable. Please try again shortly." }),
+        { status: 503, headers: corsHeaders },
+      );
     }
 
     let parsed: any;
