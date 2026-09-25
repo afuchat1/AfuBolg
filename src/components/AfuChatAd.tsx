@@ -61,12 +61,25 @@ interface ParsedAd {
   description: string;
   clickUrl: string;
   mediaHtml: string;
+  brandIcon: string;
+  feedback: { label: string; url: string; group: "stop" | "report" | "other" }[];
 }
 
 const parseAd = (raw: string): ParsedAd | null => {
   if (!raw || raw.includes("No ads available")) return null;
   const doc = new DOMParser().parseFromString(raw, "text/html");
-  // Ignore the network's header menu (docs / about links) — only read the ad body.
+  // Extract the network's branding + moderation controls before dropping the header.
+  const brandIcon =
+    doc.querySelector(".ac-btn img")?.getAttribute("src") ||
+    "https://zuekwzcnknkczelivurf.supabase.co/storage/v1/object/public/campaign-media/brand%2Fafuchat-icon.png";
+  const feedback: ParsedAd["feedback"] = [];
+  doc.querySelectorAll(".ac-menu [onclick]").forEach((el) => {
+    const m = (el.getAttribute("onclick") || "").match(/fetch\('([^']*ad-feedback[^']*)'/);
+    if (!m) return;
+    const label = (el.textContent || "").replace(/[⊘⚑›]/g, "").trim();
+    const group = /stop_showing/.test(m[1]) ? "stop" : /report/.test(m[1]) ? "report" : "other";
+    feedback.push({ label, url: m[1], group });
+  });
   doc.querySelectorAll(".ac-header, .ac-menu, .ac-pubid").forEach((el) => el.remove());
   const root: ParentNode = doc.querySelector(".ac-body") || doc;
   const anchor =
@@ -94,7 +107,7 @@ const parseAd = (raw: string): ParsedAd | null => {
 
   const wrapped = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:transparent}*{box-sizing:border-box}</style></head><body>${mediaHtml}</body></html>`;
 
-  return { headline, description, clickUrl, mediaHtml: wrapped };
+  return { headline, description, clickUrl, mediaHtml: wrapped, brandIcon, feedback };
 };
 
 const useAd = (format: AdFormat, enabled = true) => {
@@ -149,11 +162,57 @@ const AdMedia = ({ format, html }: { format: AdFormat; html: string }) => {
   );
 };
 
-const SponsorLabel = ({ children = "Sponsored" }: { children?: React.ReactNode }) => (
+const AdMenu = ({ ad, onDone, up = false }: { ad: ParsedAd; onDone: (msg: string) => void; up?: boolean }) => {
+  const [open, setOpen] = useState(false);
+  const send = (f: ParsedAd["feedback"][number]) => {
+    fetch(f.url, { method: "POST", keepalive: true }).catch(() => {});
+    setOpen(false);
+    onDone(f.group === "stop" ? "Thanks — we'll show fewer ads like this." : "Report received. Thank you.");
+  };
+  const stop = ad.feedback.filter((f) => f.group === "stop");
+  const reports = ad.feedback.filter((f) => f.group !== "stop");
+  return (
+    <div className="relative normal-case tracking-normal">
+      <button
+        type="button"
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((o) => !o); }}
+        aria-label="Ad settings"
+        aria-expanded={open}
+        className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground"
+      >
+        <img src={ad.brandIcon} alt="" width={14} height={14} className="rounded-sm" />
+        AfuChat <span className="text-[9px]">▾</span>
+      </button>
+      {open && (
+        <div role="menu" className={`absolute right-0 ${up ? "bottom-6" : "top-6"} z-30 w-60 bg-popover text-popover-foreground shadow-lg rounded-md p-1.5 text-sm`}>
+          <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Ad settings</div>
+          {stop.map((f) => (
+            <button key={f.url} role="menuitem" onClick={() => send(f)} className="w-full text-left px-2.5 py-2 rounded hover:bg-muted">⊘ {f.label}</button>
+          ))}
+          {reports.length > 0 && (
+            <>
+              <div className="px-2.5 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">⚑ Report ad</div>
+              {reports.map((f) => (
+                <button key={f.url} role="menuitem" onClick={() => send(f)} className="w-full text-left px-2.5 py-2 pl-6 rounded hover:bg-muted">{f.label}</button>
+              ))}
+            </>
+          )}
+          <div className="mt-1 px-2.5 pt-2 text-[10px] text-muted-foreground">Ads by AfuChat</div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const SponsorLabel = ({ children = "Sponsored", ad, onDone }: { children?: React.ReactNode; ad: ParsedAd; onDone: (m: string) => void }) => (
   <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-2 px-1">
     <span>{children}</span>
-    <span className="text-primary/70">Ad · AfuChat</span>
+    <AdMenu ad={ad} onDone={onDone} />
   </div>
+);
+
+const Thanks = ({ msg }: { msg: string }) => (
+  <div className="my-6 py-8 text-center text-sm text-muted-foreground bg-muted/40">{msg}</div>
 );
 
 const ArticleAdCard = ({
@@ -209,6 +268,7 @@ const AfuChatAd = ({
   }, []);
 
   const [dismissed, setDismissed] = useState(false);
+  const [thanks, setThanks] = useState<string | null>(null);
   const [interstitialOpen, setInterstitialOpen] = useState(false);
 
   // Interstitial: gate by sessionStorage + delay
@@ -254,6 +314,9 @@ const AfuChatAd = ({
     );
   }
 
+  if (thanks && variant !== "interstitial" && variant !== "sticky-bottom") return <Thanks msg={thanks} />;
+  const done = (m: string) => { if (variant === "interstitial" || variant === "sticky-bottom") setDismissed(true); else setThanks(m); };
+
   // Interstitial: full-screen modal overlay, dismissible
   if (variant === "interstitial") {
     if (!interstitialOpen || dismissed) return null;
@@ -266,8 +329,9 @@ const AfuChatAd = ({
         <div className="w-full max-w-sm bg-card">
           <div className="flex items-center justify-between px-3 py-2 border-b border-muted">
             <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-              {label || "Advertisement"} · AfuChat
+              {label || "Advertisement"}
             </span>
+            <AdMenu ad={ad} onDone={done} />
             <button
               onClick={() => setDismissed(true)}
               aria-label="Close ad"
@@ -298,7 +362,7 @@ const AfuChatAd = ({
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground">
-                Ad · AfuChat
+                Ad
               </div>
               <div className="text-xs font-bold text-foreground truncate">
                 {ad.headline || "Sponsored"}
@@ -310,6 +374,7 @@ const AfuChatAd = ({
               )}
             </div>
           </a>
+          <AdMenu ad={ad} onDone={done} up />
           <button
             onClick={() => setDismissed(true)}
             aria-label="Dismiss ad"
@@ -325,7 +390,7 @@ const AfuChatAd = ({
   if (variant === "leaderboard") {
     return (
       <div className={`w-full my-6 ${className}`}>
-        <SponsorLabel>{label || "Advertisement"}</SponsorLabel>
+        <SponsorLabel ad={ad} onDone={done}>{label || "Advertisement"}</SponsorLabel>
         <ArticleAdCard ad={ad} format={format} compact={!isNarrow} />
       </div>
     );
@@ -334,7 +399,7 @@ const AfuChatAd = ({
   if (variant === "sidebar") {
     return (
       <aside className={`w-full max-w-[324px] ${className}`}>
-        <SponsorLabel>{label || "Sponsored"}</SponsorLabel>
+        <SponsorLabel ad={ad} onDone={done}>{label || "Sponsored"}</SponsorLabel>
         <ArticleAdCard ad={ad} format={format} />
       </aside>
     );
@@ -343,7 +408,7 @@ const AfuChatAd = ({
   if (variant === "in-feed" || variant === "native") {
     return (
       <article className={`block my-8 max-w-2xl mx-auto ${className}`}>
-        <SponsorLabel>{label || "Advertisement"}</SponsorLabel>
+        <SponsorLabel ad={ad} onDone={done}>{label || "Advertisement"}</SponsorLabel>
         <ArticleAdCard ad={ad} format={format} />
       </article>
     );
@@ -351,7 +416,7 @@ const AfuChatAd = ({
 
   return (
     <div className={`w-full my-6 max-w-md mx-auto ${className}`}>
-      <SponsorLabel>{label || "Advertisement"}</SponsorLabel>
+      <SponsorLabel ad={ad} onDone={done}>{label || "Advertisement"}</SponsorLabel>
       <ArticleAdCard ad={ad} format={format} />
     </div>
   );
